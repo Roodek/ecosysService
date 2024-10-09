@@ -15,6 +15,9 @@ import java.util.UUID;
 @Document(collection = "games")
 public class Game {
 
+    public static final String ID_FIELD = "_id";
+    public static final String PLAYERS_FIELD = "players";
+    public static final String CARD_STACK_FIELD = "cardStack";
     @Id
     private UUID id;
     private List<Player> players;

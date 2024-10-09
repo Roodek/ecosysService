@@ -2,27 +2,24 @@ package com.eco.ecosystem.controllers;
 
 
 import com.eco.ecosystem.entities.Player;
-import com.eco.ecosystem.services.PlayerService;
+import com.eco.ecosystem.repository.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(path = "api/v1/players")
 public class PlayerController {
 
-    private final PlayerService playerService;
-
     @Autowired
-    public PlayerController(PlayerService playerService) {
-        this.playerService = playerService;
-    }
+    PlayerService playerService;
 
-    @GetMapping
-    public List<Player> getPlayers(){
-        return playerService.getStudents();
+    @PostMapping(path = "/{gameID}/{playerID}")
+    public void updatePlayer(@PathVariable String gameID,
+                             @PathVariable String playerID,
+                             @RequestBody Player body){
+
+        playerService.updatePLayer(UUID.fromString(gameID),UUID.fromString(playerID),body);
     }
 }
