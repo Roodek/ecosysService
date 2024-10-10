@@ -39,4 +39,9 @@ public class GameController {
     public Mono<Void> deleteGame(@PathVariable String id){
         return service.deleteGame(UUID.fromString(id));
     }
+
+    @GetMapping("/{id}/end")
+    public Mono<GameDto> endGame(@PathVariable String id){
+        return service.getGame(UUID.fromString(id));//TODO run final count
+    }
 }

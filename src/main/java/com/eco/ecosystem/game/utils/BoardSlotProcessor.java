@@ -5,11 +5,11 @@ import com.eco.ecosystem.game.board.ProcessSlotStrategy;
 import com.eco.ecosystem.game.board.Slot;
 import com.eco.ecosystem.game.cards.Card;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class BoardSlotProcessor {
 
-    public static void iterateOverBoardEntriesAndApplyStrategy(ArrayList<ArrayList<Card>> board, ProcessSlotStrategy strategy) {
+    public static void iterateOverBoardEntriesAndApplyStrategy(List<List<Card>> board, ProcessSlotStrategy strategy) {
         if(!board.isEmpty()) {
             for(int x =0;x<board.size();x++){
                 for(int y = 0;y<board.get(x).size();y++){
@@ -19,7 +19,7 @@ public class BoardSlotProcessor {
         }
     }
 
-    private static NeighborSlots getNeighbours(ArrayList<ArrayList<Card>> board, int x, int y){
+    private static NeighborSlots getNeighbours(List<List<Card>> board, int x, int y){
         var neighbours = new NeighborSlots();
         if(isLeftUpperCorner(board, x, y)){
             addRightSlot(x, y, neighbours);
@@ -66,32 +66,32 @@ public class BoardSlotProcessor {
         return neighbours;
     }
 
-    private static boolean isBottomWall(ArrayList<ArrayList<Card>> board, int x, int y) {
+    private static boolean isBottomWall(List<List<Card>> board, int x, int y) {
         return x == board.size()-1 && y < board.get(x).size() - 1 && y > 0;
     }
-    private static boolean isUpperWall(ArrayList<ArrayList<Card>> board, int x, int y) {
+    private static boolean isUpperWall(List<List<Card>> board, int x, int y) {
         return x == 0 && y < board.get(x).size() - 1 && y > 0;
     }
-    private static boolean isLeftWall(ArrayList<ArrayList<Card>> board, int x, int y) {
+    private static boolean isLeftWall(List<List<Card>> board, int x, int y) {
         return x > 0 && x < board.size() - 1 && y == 0;
     }
-    private static boolean isRightWall(ArrayList<ArrayList<Card>> board, int x, int y) {
+    private static boolean isRightWall(List<List<Card>> board, int x, int y) {
         return x > 0 && x < board.size() - 1 && y == board.get(x).size()-1;
     }
 
-    private static boolean isBottomRightCorner(ArrayList<ArrayList<Card>> board, int x, int y) {
+    private static boolean isBottomRightCorner(List<List<Card>> board, int x, int y) {
         return x == board.size() - 1 && y == board.get(x).size() - 1;
     }
 
-    private static boolean isBottomLeftCorner(ArrayList<ArrayList<Card>> board, int x, int y) {
+    private static boolean isBottomLeftCorner(List<List<Card>> board, int x, int y) {
         return x == board.size() - 1 && y == 0;
     }
 
-    private static boolean isUpperRightCorner(ArrayList<ArrayList<Card>> board, int x, int y) {
+    private static boolean isUpperRightCorner(List<List<Card>> board, int x, int y) {
         return x == 0 && y == board.get(x).size() - 1;
     }
 
-    private static boolean isLeftUpperCorner(ArrayList<ArrayList<Card>> board, int x, int y) {
+    private static boolean isLeftUpperCorner(List<List<Card>> board, int x, int y) {
         return x == 0 && y == 0;
     }
 

@@ -1,15 +1,18 @@
 package com.eco.ecosystem.game.board;
 
+import com.eco.ecosystem.entities.PlayerCard;
 import com.eco.ecosystem.game.cards.Card;
 import com.eco.ecosystem.game.cards.FieldCard;
+import com.eco.ecosystem.game.exceptions.InvalidCardTypeException;
 import com.eco.ecosystem.game.exceptions.InvalidMoveException;
 import com.eco.ecosystem.game.utils.BoardSlotProcessor;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Objects;
+import java.util.*;
 
+@Getter
+@Setter
 public class Board {
     public static final int CARD_NAME_LENGTH = 11;
     private int sizeVertical = 0;
@@ -18,40 +21,39 @@ public class Board {
     private int maxHorizontalSize = 5;
     private int maxRiverLength = 0;
     private int wolfCount = 0;
-    private ArrayList<ArrayList<Card>> cardBoard = new ArrayList<>();
-
-    public int getMaxRiverLength() {
-        return maxRiverLength;
-    }
-
-    public void setMaxRiverLength(int maxRiverLength) {
-        this.maxRiverLength = maxRiverLength;
-    }
-
-    public int getWolfCount() {
-        return wolfCount;
-    }
-
-    public void setWolfCount(int wolfCount) {
-        this.wolfCount = wolfCount;
-    }
+    private List<List<Card>> cardBoard = new ArrayList<>();
 
     public Board() {}
-
-    public void setSizeVertical(int sizeVertical) {
-        this.sizeVertical = sizeVertical;
+    public Board(List<List<PlayerCard>> playersCardBoard){
+            this.cardBoard = playersCardBoard.stream().map(row->row.stream().map(playerCard->{
+                try {
+                    return Card.fromString(playerCard.getCardType());
+                } catch (InvalidCardTypeException e) {
+                    throw new RuntimeException(e);
+                }
+            }).toList()).toList();
+            readVerticalAndHorizontalSizeFromDBCardBoard(playersCardBoard);
     }
+    private void readVerticalAndHorizontalSizeFromDBCardBoard(List<List<PlayerCard>> playersCardBoard){
+        if (playersCardBoard.get(0).stream().allMatch(Objects::isNull)){
+            this.sizeVertical = playersCardBoard.size()-2;
+        }else{
+            this.sizeVertical = playersCardBoard.size();
+            if(this.sizeVertical==5){
+                this.maxVerticalSize=5;
+                this.maxHorizontalSize=4;
+            }
+        }
+        if(playersCardBoard.stream().map(row->row.get(0)).allMatch(Objects::isNull)){
+            this.sizeHorizontal = playersCardBoard.get(0).size()-2;
+        }else{
+            this.sizeHorizontal = playersCardBoard.get(0).size();
+            if(this.sizeHorizontal==5){
+                this.maxHorizontalSize=5;
+                this.maxVerticalSize=4;
+            }
+        }
 
-    public void setSizeHorizontal(int sizeHorizontal) {
-        this.sizeHorizontal = sizeHorizontal;
-    }
-
-    public int getSizeVertical() {
-        return sizeVertical;
-    }
-
-    public int getSizeHorizontal() {
-        return sizeHorizontal;
     }
 
     public void printBoard() {
@@ -75,10 +77,6 @@ public class Board {
         } else {
             return cardBoard.get(slot.coordX()).get(slot.coordY());
         }
-    }
-
-    public ArrayList<ArrayList<Card>> getCardBoard() {
-        return cardBoard;
     }
 
     public void putFirstCard(Card card) throws InvalidMoveException {
