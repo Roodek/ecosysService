@@ -1,7 +1,9 @@
 package com.eco.ecosystem.controllers;
 
+import com.eco.ecosystem.controllers.requestBodies.PlayerNameBody;
 import com.eco.ecosystem.dto.GameDto;
 import com.eco.ecosystem.services.GameService;
+import com.eco.ecosystem.services.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -14,34 +16,45 @@ import java.util.UUID;
 public class GameController {
 
     @Autowired
-    private GameService service;
+    private GameService gameService;
 
+    @Autowired
+    private PlayerService playerService;
     @GetMapping
     public Flux<GameDto> getGames(){
-        return service.getAllGames();
+        return gameService.getAllGames();
     }
-    @GetMapping("/{id}")
-    public Mono<GameDto> getGame(@PathVariable String id){
-        return service.getGame(UUID.fromString(id));
-    }
-
     @PostMapping
     public Mono<GameDto> saveGame(@RequestBody Mono<GameDto> gameDtoMono){
-        return service.saveGame(gameDtoMono);
+        return gameService.saveGame(gameDtoMono);
+    }
+
+    @PostMapping("/new")
+    public Mono<UUID> initGame(@RequestBody PlayerNameBody playerName){
+        return gameService.initGame(playerName.getPlayerName());
+    }
+    @PostMapping("/{id}/join")
+    public Mono<UUID> joinGame(@PathVariable UUID id,
+                               @RequestBody PlayerNameBody playerName ){
+        return gameService.joinGame(id,playerName.getPlayerName());
+    }
+    @GetMapping("/{id}")
+    public Mono<GameDto> getGame(@PathVariable UUID id){
+        return gameService.getGame(id);
     }
 
     @PutMapping("/update/{id}")
     public Mono<GameDto> updateGame(@RequestBody Mono<GameDto> gameDtoMono, @PathVariable String id){
-        return service.updateGame(gameDtoMono, UUID.fromString(id));
+        return gameService.updateGame(gameDtoMono, UUID.fromString(id));
     }
 
     @DeleteMapping("/delete/{id}")
-    public Mono<Void> deleteGame(@PathVariable String id){
-        return service.deleteGame(UUID.fromString(id));
+    public Mono<Void> deleteGame(@PathVariable UUID id){
+        return gameService.deleteGame(id);
     }
 
-    @GetMapping("/{id}/end")
-    public Mono<GameDto> endGame(@PathVariable String id){
-        return service.getGame(UUID.fromString(id));//TODO run final count
-    }
+
+
+
+
 }

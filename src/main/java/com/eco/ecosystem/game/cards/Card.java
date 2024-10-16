@@ -1,5 +1,6 @@
 package com.eco.ecosystem.game.cards;
 
+import com.eco.ecosystem.entities.PlayerCard;
 import com.eco.ecosystem.game.exceptions.InvalidCardTypeException;
 
 import java.util.List;
@@ -51,5 +52,24 @@ public interface Card {
         }catch (IllegalArgumentException e){
             throw new InvalidCardTypeException();
         }
+    }
+    static Card from(CardType cardType) {
+        return cardType==null?null: switch (cardType) {
+            case BEE -> new BeeCard();
+            case BEAR -> new BearCard();
+            case DRAGONFLY -> new DragonflyCard();
+            case EAGLE -> new EagleCard();
+            case ELK -> new ElkCard();
+            case FISH -> new FishCard();
+            case FOX -> new FoxCard();
+            case MEADOW -> new MeadowCard();
+            case RABBIT -> new RabbitCard();
+            case RIVER -> new RiverCard();
+            case WOLF -> new WolfCard();
+        };
+    }
+
+    static PlayerCard toPlayerCard(CardType cardType){
+        return new PlayerCard(cardType.toString());
     }
 }

@@ -24,14 +24,18 @@ public class Board {
     private List<List<Card>> cardBoard = new ArrayList<>();
 
     public Board() {}
+
+    public List<List<PlayerCard>> toResponseBoard(){
+        return cardBoard.stream().map(row->row.stream().map(elem->elem==null?null:new PlayerCard(elem.getType().toString())).toList()).toList();
+    }
     public Board(List<List<PlayerCard>> playersCardBoard){
-            this.cardBoard = playersCardBoard.stream().map(row->row.stream().map(playerCard->{
+            this.cardBoard = new ArrayList<>(playersCardBoard.stream().map(row-> new ArrayList<>(row.stream().filter(Objects::nonNull).map(playerCard->{
                 try {
                     return Card.fromString(playerCard.getCardType());
                 } catch (InvalidCardTypeException e) {
                     throw new RuntimeException(e);
                 }
-            }).toList()).toList();
+            }).toList())).toList());
             readVerticalAndHorizontalSizeFromDBCardBoard(playersCardBoard);
     }
     private void readVerticalAndHorizontalSizeFromDBCardBoard(List<List<PlayerCard>> playersCardBoard){
@@ -68,7 +72,6 @@ public class Board {
             }
             System.out.println();
         }
-
     }
 
     public Card getCardAtSlot(Slot slot) {
@@ -83,7 +86,7 @@ public class Board {
         putCard(card, 0, 0);
     }
 
-    public void putCard(Card card, int coordX, int coordY) throws IndexOutOfBoundsException, InvalidMoveException {
+    public Board putCard(Card card, int coordX, int coordY) throws IndexOutOfBoundsException, InvalidMoveException {
         if (isBoardCompleted()) {
             throw new InvalidMoveException("Invalid move, board is already completed");
         }
@@ -119,7 +122,7 @@ public class Board {
             assignNeighbours();
             mergeRiversAndMeadows();
         }
-
+        return this;
     }
 
     public void rabbitSwap(Slot card1,Slot card2){

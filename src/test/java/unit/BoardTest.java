@@ -37,7 +37,7 @@ class BoardTest {
     void constructorFromRawArrayOfString(){
         var rawArray =new ArrayList<List<PlayerCard>>();
         rawArray.add(new ArrayList<>(Arrays.asList(null,null,null,null,null)));
-        rawArray.add(new ArrayList<>(Arrays.asList(new PlayerCard("fox"),new PlayerCard("elk"),new PlayerCard("bee"),new PlayerCard("river"),new PlayerCard("wolf"))));
+        rawArray.add(new ArrayList<>(Arrays.asList(new PlayerCard("FOX"),new PlayerCard("ELK"),new PlayerCard("BEE"),new PlayerCard("RIVER"),new PlayerCard("WOLF"))));
         rawArray.add(new ArrayList<>(Arrays.asList(null,null,null,null,null)));
 
         var board = new Board(rawArray);
@@ -46,30 +46,30 @@ class BoardTest {
         assertEquals(5,board.getMaxHorizontalSize());
         assertEquals(4,board.getMaxVerticalSize());
 
-        var rawArray1 =new ArrayList<List<String>>();
+        var rawArray1 =new ArrayList<List<PlayerCard>>();
         rawArray1.add(new ArrayList<>(Arrays.asList(null,null,null,null,null)));
-        rawArray1.add(new ArrayList<>(Arrays.asList("fox","elk","bee","river","wolf")));
-        rawArray1.add(new ArrayList<>(Arrays.asList(null,null,"river",null,null)));
+        rawArray1.add(new ArrayList<>(Arrays.asList(new PlayerCard("FOX"),new PlayerCard("ELK"),new PlayerCard("BEE"),new PlayerCard("RIVER"),new PlayerCard("WOLF"))));
+        rawArray1.add(new ArrayList<>(Arrays.asList(null,null,new PlayerCard("RIVER"),null,null)));
         rawArray1.add(new ArrayList<>(Arrays.asList(null,null,null,null,null)));
 
-//        var board1 = new Board(rawArray1);
-//        assertEquals(2,board1.getSizeVertical());
-//        assertEquals(5,board1.getSizeHorizontal());
-//        assertEquals(5,board1.getMaxHorizontalSize());
-//        assertEquals(4,board1.getMaxVerticalSize());
-//
-//        var rawArray2 =new ArrayList<List<String>>();
-//        rawArray2.add(new ArrayList<>(Arrays.asList(null,null,null,null,null)));
-//        rawArray2.add(new ArrayList<>(Arrays.asList(null,null,"meadow",null,null)));
-//        rawArray2.add(new ArrayList<>(Arrays.asList(null,"elk","bee","river",null)));
-//        rawArray2.add(new ArrayList<>(Arrays.asList(null,null,"river",null,null)));
-//        rawArray2.add(new ArrayList<>(Arrays.asList(null,null,null,null,null)));
-//
-//        var board2 = new Board(rawArray2);
-//        assertEquals(3,board2.getSizeVertical());
-//        assertEquals(3,board2.getSizeHorizontal());
-//        assertEquals(5,board2.getMaxHorizontalSize());
-//        assertEquals(5,board2.getMaxVerticalSize());
+        var board1 = new Board(rawArray1);
+        assertEquals(2,board1.getSizeVertical());
+        assertEquals(5,board1.getSizeHorizontal());
+        assertEquals(5,board1.getMaxHorizontalSize());
+        assertEquals(4,board1.getMaxVerticalSize());
+
+        var rawArray2 =new ArrayList<List<PlayerCard>>();
+        rawArray2.add(new ArrayList<>(Arrays.asList(null,null,null,null,null)));
+        rawArray2.add(new ArrayList<>(Arrays.asList(null,null,new PlayerCard("MEADOW"),null,null)));
+        rawArray2.add(new ArrayList<>(Arrays.asList(null,new PlayerCard("ELK"),new PlayerCard("BEE"),new PlayerCard("RIVER"),null)));
+        rawArray2.add(new ArrayList<>(Arrays.asList(null,null,new PlayerCard("RIVER"),null,null)));
+        rawArray2.add(new ArrayList<>(Arrays.asList(null,null,null,null,null)));
+
+        var board2 = new Board(rawArray2);
+        assertEquals(3,board2.getSizeVertical());
+        assertEquals(3,board2.getSizeHorizontal());
+        assertEquals(5,board2.getMaxHorizontalSize());
+        assertEquals(5,board2.getMaxVerticalSize());
 
 
 

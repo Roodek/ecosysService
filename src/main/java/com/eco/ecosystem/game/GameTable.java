@@ -1,14 +1,16 @@
 package com.eco.ecosystem.game;
 
 
-import java.util.*;
-
 import com.eco.ecosystem.game.board.Board;
 import com.eco.ecosystem.game.cards.*;
+import lombok.Getter;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.eco.ecosystem.game.cards.Card.CardType.*;
 
+@Getter
 public class GameTable {
 
     private final List<GamePlayer> gamePlayers;
@@ -18,15 +20,34 @@ public class GameTable {
         this.gamePlayers = gamePlayers;
     }
 
+//    public GameTable swapPlayersHands(SwapDirection direction) {
+//        if (direction == SwapDirection.LEFT) {
+//            List<Card> swapped = gamePlayers.get(0).getHand();
+//            List<Card> buffer;
+//            for (int i = gamePlayers.size() - 1; i >= 0; i--) {
+//                buffer = gamePlayers.get(i).getHand();
+//                gamePlayers.get(i).setHand(swapped);
+//                swapped = buffer;
+//            }
+//        } else {
+//            List<Card> swapped = gamePlayers.get(gamePlayers.size() - 1).getHand();
+//            List<Card> buffer;
+//            for (int i = 0; i < gamePlayers.size(); i++) {
+//                buffer = gamePlayers.get(i).getHand();
+//                gamePlayers.get(i).setHand(swapped);
+//                swapped = buffer;
+//            }
+//        }
+//        return this;
+//    }
+
     private void countPointsForGivenCardTypeInGeneralPointCount(GamePlayer gamePlayer, Card card) {
         var cardPoints = card.count();
         gamePlayer.getGeneralPointCount().put(card.getType(), gamePlayer.getGeneralPointCount().get(card.getType()) + cardPoints);
     }
 
     public List<GamePlayer> endGame() {
-        gamePlayers.forEach(gamePlayer -> {
-            countAllCardPointsAndPutThemToGeneralPointCount(gamePlayer);
-        });
+        gamePlayers.forEach(this::countAllCardPointsAndPutThemToGeneralPointCount);
         compareWolvesAndAssignPoints();
         compareRiversAndAssignPoints();
         return gamePlayers.stream().peek(gamePlayer -> {
@@ -89,7 +110,7 @@ public class GameTable {
     private Map<Integer, List<GamePlayer>> getRewardedPointsForRankedCard(Card.CardType cardType, Integer podiumPLaces) {
         var playersGroupedByNumberOfRankedCards = gamePlayers.stream()
                 .sorted(Comparator.comparing(gamePlayer -> getWolfOrRiverCount(gamePlayer, cardType), Comparator.reverseOrder()))
-                .collect(Collectors.groupingBy(gamePlayer -> getWolfOrRiverCount(gamePlayer, cardType),LinkedHashMap::new,Collectors.toList()));
+                .collect(Collectors.groupingBy(gamePlayer -> getWolfOrRiverCount(gamePlayer, cardType), LinkedHashMap::new, Collectors.toList()));
 
         var podium = new HashMap<Integer, List<GamePlayer>>();
         playersGroupedByNumberOfRankedCards.values().forEach(playersGroupedByCardCount -> {
