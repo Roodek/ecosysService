@@ -20,27 +20,6 @@ public class GameTable {
         this.gamePlayers = gamePlayers;
     }
 
-//    public GameTable swapPlayersHands(SwapDirection direction) {
-//        if (direction == SwapDirection.LEFT) {
-//            List<Card> swapped = gamePlayers.get(0).getHand();
-//            List<Card> buffer;
-//            for (int i = gamePlayers.size() - 1; i >= 0; i--) {
-//                buffer = gamePlayers.get(i).getHand();
-//                gamePlayers.get(i).setHand(swapped);
-//                swapped = buffer;
-//            }
-//        } else {
-//            List<Card> swapped = gamePlayers.get(gamePlayers.size() - 1).getHand();
-//            List<Card> buffer;
-//            for (int i = 0; i < gamePlayers.size(); i++) {
-//                buffer = gamePlayers.get(i).getHand();
-//                gamePlayers.get(i).setHand(swapped);
-//                swapped = buffer;
-//            }
-//        }
-//        return this;
-//    }
-
     private void countPointsForGivenCardTypeInGeneralPointCount(GamePlayer gamePlayer, Card card) {
         var cardPoints = card.count();
         gamePlayer.getGeneralPointCount().put(card.getType(), gamePlayer.getGeneralPointCount().get(card.getType()) + cardPoints);
