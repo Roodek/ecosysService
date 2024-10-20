@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @Testcontainers
-@ContextConfiguration(classes = MongoDBTestContainerConfig.class)
 public class GameScenarioTest extends ScenarioTest {
 
     @Autowired
