@@ -1,6 +1,5 @@
 package com.eco.ecosystem.entities;
 
-import com.eco.ecosystem.game.board.Board;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,17 +29,16 @@ public class Player {
     private List<List<PlayerCard>> board;
     @JsonProperty("pointCount")
     private int pointCount;
-//    @JsonProperty("generalPointCount")
-//    private Map<Card.CardType, Integer> generalPointCount;
+
 
     @Override
     public String toString() {
         return this.name+" - "+this.pointCount + " - "+this.cardsInHand;
     }
 
-    public Board getAsCalculationBoard(){
-        return new Board(board);
-    }
+//    public Board getAsCalculationBoard(){
+//        return new Board(board);
+//    }
 
 
 }

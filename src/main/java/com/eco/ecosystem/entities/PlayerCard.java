@@ -15,7 +15,6 @@ public class PlayerCard {
     @JsonProperty("cardType")
     String cardType;
 
-
     public PlayerCard(Card card){
         this.cardType = card.toString();
     }
