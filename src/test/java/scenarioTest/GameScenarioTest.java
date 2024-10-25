@@ -38,12 +38,13 @@ public class GameScenarioTest extends ScenarioTest {
                                 List.of(new PlayerCard("ELK"), new PlayerCard("RIVER")),
                                 board,0
                         )),
-                List.of(new PlayerCard("BEE"), new PlayerCard("ELK")));
+                List.of(new PlayerCard("BEE"), new PlayerCard("ELK")),3);
         reactiveMongoTemplate.save(AppUtils.gameDtoToEntity(newGame),"games").block();
         var response = createGetAllGamesRequest();
         ArrayList<GameDto> resBody = new ObjectMapper().readValue(response.body().string(), new TypeReference<List<GameDto>>(){});
         assertEquals(200,response.code());
         assertEquals(1,resBody.size());
+        assertEquals(3,resBody.get(0).getTurn());
 
     }
 

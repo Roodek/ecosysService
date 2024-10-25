@@ -43,7 +43,7 @@ public class WebSocketController {
 
     @MessageMapping("/game/{gameID}/updateBoards")
     public void updateBoards(@DestinationVariable UUID gameID) {
-        //TODO swapHands and update boards
+        gameService.swapPlayerHands(gameID);
         simpMessagingTemplate.convertAndSend("/specific/" + gameID.toString(),
                 playerService.getPlayers(gameID)
                         .flatMap(players -> Mono.just(players.stream()

@@ -9,10 +9,12 @@ import com.eco.ecosystem.game.exceptions.FullPlayerCountException;
 import com.eco.ecosystem.game.exceptions.GameNotFoundException;
 import com.eco.ecosystem.repository.GameRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.FindAndReplaceOptions;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -24,6 +26,8 @@ import java.util.UUID;
 @Service
 public class GameService {
 
+    @Autowired
+    SimpMessagingTemplate simpMessagingTemplate;
     @Autowired
     private GameRepository gameRepository;
     @Autowired
@@ -43,17 +47,21 @@ public class GameService {
                 .map(AppUtils::gameEntityToDto);
     }
 
-    public Mono<GameDto> swapPlayerHands(UUID gameID, Game.SwapDirection direction) {
-        return gameRepository.findById(gameID).map(game ->
-            game.swapPlayersHands(direction)
-        ).flatMap(gameRepository::save).map(AppUtils::gameEntityToDto);
+    public void swapPlayerHands(UUID gameID) {
+        gameRepository.findById(gameID)
+                .map(AppUtils::gameEntityToDto)
+                .map(GameDto::swapPlayersHands)
+                .map(AppUtils::gameDtoToEntity)
+                .flatMap(gameRepository::save)
+                .ignoreElement();
     }
 
-    public Mono<GameDto> updateGame(Mono<GameDto> gameDtoMono, UUID id) {
-        return gameRepository.findById(id)
-                .flatMap(p -> gameDtoMono.map(AppUtils::gameDtoToEntity)
-                        .doOnNext(e -> e.setId(id)))
-                .flatMap(gameRepository::save)
+    public Mono<GameDto> updateGame(GameDto gameDto, UUID gameID) {
+        Query query = new Query(
+                Criteria.where(Game.ID_FIELD).is(gameID));
+        FindAndReplaceOptions options = FindAndReplaceOptions.options().returnNew();
+
+        return reactiveMongoTemplate.findAndReplace(query, AppUtils.gameDtoToEntity(gameDto), options, Game.COLLECTION_NAME)
                 .map(AppUtils::gameEntityToDto);
     }
 
@@ -64,7 +72,7 @@ public class GameService {
     public Mono<UUID> initGame(String playerName) {
         var newId = UUID.randomUUID();
         var player = new Player(UUID.randomUUID(), playerName, List.of(), List.of(List.of()), 0);
-        var newGame = Mono.just(new GameDto(newId, List.of(player), CardStack.initCardStack().stream().map(PlayerCard::new).toList()));
+        var newGame = Mono.just(new GameDto(newId, List.of(player), CardStack.initCardStack().stream().map(PlayerCard::new).toList(), 0));
         return newGame.map(AppUtils::gameDtoToEntity)
                 .flatMap(gameRepository::insert)
                 .then(Mono.just(newId));
@@ -95,4 +103,8 @@ public class GameService {
         return null;
     }
 
+    public Mono<Void> startGame(UUID gameID) {
+        validateGameExistsAndGet(gameID).map(GameDto::startGame);
+        return Mono.empty();
+    }
 }

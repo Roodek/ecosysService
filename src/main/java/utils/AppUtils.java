@@ -6,10 +6,9 @@ import org.springframework.beans.BeanUtils;
 
 public class AppUtils {
     public static GameDto gameEntityToDto(Game game) {
-        return  new GameDto(game.getId(),game.getPlayers(),game.getCardStack());
+        return  new GameDto(game.getId(),game.getPlayers(),game.getCardStack(), game.getTurn());
     }
 
-    // Convert ProductDto to Product entity
     public static Game gameDtoToEntity(GameDto gameDto) {
         Game game = new Game();
         BeanUtils.copyProperties(gameDto, game);

@@ -38,14 +38,14 @@ public class GameController {
                                @RequestBody PlayerNameBody playerName ){
         return gameService.joinGame(id,playerName.getPlayerName());
     }
+
+    @PostMapping("{id}/start")
+    public Mono<Void> startGame(@PathVariable UUID id){
+        return gameService.startGame(id);
+    }
     @GetMapping("/{id}")
     public Mono<GameDto> getGame(@PathVariable UUID id){
         return gameService.getGame(id);
-    }
-
-    @PutMapping("/update/{id}")
-    public Mono<GameDto> updateGame(@RequestBody Mono<GameDto> gameDtoMono, @PathVariable String id){
-        return gameService.updateGame(gameDtoMono, UUID.fromString(id));
     }
 
     @DeleteMapping("/delete/{id}")

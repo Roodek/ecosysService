@@ -116,7 +116,7 @@ public class ScenarioTest {
                         List.of(),
                         List.of(List.of()), 0
                 )
-        ), CardStack.initCardStack().stream().map(PlayerCard::new).toList());
+        ), CardStack.initCardStack().stream().map(PlayerCard::new).toList(),0);
         var dbRecord = AppUtils.gameDtoToEntity(newGame);
         reactiveMongoTemplate.save(dbRecord, "games").block();
     }

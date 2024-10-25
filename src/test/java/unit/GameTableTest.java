@@ -6,6 +6,7 @@ import com.eco.ecosystem.entities.PlayerCard;
 import com.eco.ecosystem.game.board.Board;
 import com.eco.ecosystem.game.cards.Card;
 import org.junit.jupiter.api.Test;
+import utils.AppUtils;
 
 import java.util.List;
 
@@ -20,22 +21,23 @@ public class GameTableTest {
         var player3 = initPlayerHand("player3",List.of(new PlayerCard(Card.from(Card.CardType.RIVER))));
         var gameTable = new Game();
         gameTable.setPlayers(List.of(player1,player2,player3));
+        var game = AppUtils.gameEntityToDto(gameTable);
 
-        assertEquals(Card.CardType.BEE.toString(),gameTable.getPlayers().get(0).getCardsInHand().get(0).getCardType());
-        assertEquals(Card.CardType.ELK.toString(),gameTable.getPlayers().get(1).getCardsInHand().get(0).getCardType());
-        assertEquals(Card.CardType.RIVER.toString(), gameTable.getPlayers().get(2).getCardsInHand().get(0).getCardType());
+        assertEquals(Card.CardType.BEE.toString(),game.getPlayers().get(0).getCardsInHand().get(0).getCardType());
+        assertEquals(Card.CardType.ELK.toString(),game.getPlayers().get(1).getCardsInHand().get(0).getCardType());
+        assertEquals(Card.CardType.RIVER.toString(), game.getPlayers().get(2).getCardsInHand().get(0).getCardType());
 
-        gameTable.swapPlayersHands(Game.SwapDirection.LEFT);
+        game.swapPlayersHands();
 
-        assertEquals(Card.CardType.ELK.toString(),gameTable.getPlayers().get(0).getCardsInHand().get(0).getCardType());
-        assertEquals( Card.CardType.RIVER.toString(), gameTable.getPlayers().get(1).getCardsInHand().get(0).getCardType());
-        assertEquals(Card.CardType.BEE.toString(), gameTable.getPlayers().get(2).getCardsInHand().get(0).getCardType());
+        assertEquals(Card.CardType.ELK.toString(),game.getPlayers().get(0).getCardsInHand().get(0).getCardType());
+        assertEquals( Card.CardType.RIVER.toString(), game.getPlayers().get(1).getCardsInHand().get(0).getCardType());
+        assertEquals(Card.CardType.BEE.toString(), game.getPlayers().get(2).getCardsInHand().get(0).getCardType());
+        game.setTurn(10);
+        game.swapPlayersHands();
 
-        gameTable.swapPlayersHands(Game.SwapDirection.RIGHT);
-
-        assertEquals(Card.CardType.BEE.toString(),gameTable.getPlayers().get(0).getCardsInHand().get(0).getCardType());
-        assertEquals(Card.CardType.ELK.toString(),gameTable.getPlayers().get(1).getCardsInHand().get(0).getCardType());
-        assertEquals(Card.CardType.RIVER.toString(), gameTable.getPlayers().get(2).getCardsInHand().get(0).getCardType());
+        assertEquals(Card.CardType.BEE.toString(),game.getPlayers().get(0).getCardsInHand().get(0).getCardType());
+        assertEquals(Card.CardType.ELK.toString(),game.getPlayers().get(1).getCardsInHand().get(0).getCardType());
+        assertEquals(Card.CardType.RIVER.toString(), game.getPlayers().get(2).getCardsInHand().get(0).getCardType());
     }
 
     private Player initPlayerHand(String name, List<PlayerCard> hand){
