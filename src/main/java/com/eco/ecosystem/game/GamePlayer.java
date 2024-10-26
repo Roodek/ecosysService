@@ -31,9 +31,4 @@ public class GamePlayer {
         this.board = board;
         Arrays.stream(Card.CardType.values()).forEach(cardType -> generalPointCount.put(cardType,0));
     }
-
-    public GamePlayer(List<Card> hand){
-        this.hand = hand;
-    }
-
 }

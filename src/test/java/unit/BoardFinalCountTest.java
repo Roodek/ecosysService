@@ -4,6 +4,7 @@ import com.eco.ecosystem.game.board.Board;
 import com.eco.ecosystem.game.cards.*;
 import com.eco.ecosystem.game.GameTable;
 import com.eco.ecosystem.game.GamePlayer;
+import com.eco.ecosystem.game.exceptions.InvalidCardTypeException;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -212,6 +213,55 @@ public class BoardFinalCountTest extends CardTest {
 
     }
 
+    @Test
+    void simulateExample4GamePlayerGame1() throws InvalidCardTypeException {
+        //player1
+
+        var rodekCardBoard =new ArrayList<ArrayList<Card>>();
+        rodekCardBoard.add(new ArrayList<>(Arrays.asList(Card.from(Card.CardType.FOX),Card.from(Card.CardType.RABBIT) ,Card.from(Card.CardType.RABBIT) ,Card.from(Card.CardType.DRAGONFLY) ,Card.from(Card.CardType.RIVER))));
+        rodekCardBoard.add(new ArrayList<>(Arrays.asList(Card.from(Card.CardType.FOX),Card.from(Card.CardType.EAGLE),Card.from(Card.CardType.EAGLE),Card.from(Card.CardType.FISH) ,Card.from(Card.CardType.RIVER))));
+        rodekCardBoard.add(new ArrayList<>(Arrays.asList(Card.from(Card.CardType.MEADOW),Card.from(Card.CardType.BEE)   ,Card.from(Card.CardType.RABBIT) ,Card.from(Card.CardType.BEAR) ,Card.from(Card.CardType.RIVER))));
+        rodekCardBoard.add(new ArrayList<>(Arrays.asList(Card.from(Card.CardType.MEADOW),Card.from(Card.CardType.MEADOW)  ,Card.from(Card.CardType.WOLF),Card.from(Card.CardType.WOLF),Card.from(Card.CardType.WOLF))));
+        //player2
+
+
+        var michlCardBoard =new ArrayList<ArrayList<Card>>();
+        michlCardBoard.add(new ArrayList<>(Arrays.asList(Card.from(Card.CardType.BEAR),Card.from(Card.CardType.WOLF),Card.from(Card.CardType.MEADOW),Card.from(Card.CardType.RABBIT),Card.from(Card.CardType.EAGLE))));
+        michlCardBoard.add(new ArrayList<>(Arrays.asList(Card.from(Card.CardType.FOX),Card.from(Card.CardType.ELK),Card.from(Card.CardType.RIVER),Card.from(Card.CardType.FISH),Card.from(Card.CardType.BEAR))));
+        michlCardBoard.add(new ArrayList<>(Arrays.asList(Card.from(Card.CardType.ELK), Card.from(Card.CardType.WOLF),Card.from(Card.CardType.RIVER) ,Card.from(Card.CardType.DRAGONFLY),Card.from(Card.CardType.BEAR))));
+        michlCardBoard.add(new ArrayList<>(Arrays.asList(Card.from(Card.CardType.EAGLE),Card.from(Card.CardType.FISH) ,Card.from(Card.CardType.RIVER) ,Card.from(Card.CardType.RIVER),Card.from(Card.CardType.FISH))));
+        //player3
+
+        var tataCardBoard =new ArrayList<ArrayList<Card>>();
+        tataCardBoard.add(new ArrayList<>(Arrays.asList(Card.from(Card.CardType.ELK),Card.from(Card.CardType.BEAR),Card.from(Card.CardType.FISH),Card.from(Card.CardType.BEE),Card.from(Card.CardType.MEADOW))));
+        tataCardBoard.add(new ArrayList<>(Arrays.asList(Card.from(Card.CardType.BEAR),Card.from(Card.CardType.FISH),Card.from(Card.CardType.RIVER),Card.from(Card.CardType.DRAGONFLY),Card.from(Card.CardType.ELK))));
+        tataCardBoard.add(new ArrayList<>(Arrays.asList(Card.from(Card.CardType.FISH),Card.from(Card.CardType.EAGLE),Card.from(Card.CardType.FOX),Card.from(Card.CardType.ELK),Card.from(Card.CardType.MEADOW))));
+        tataCardBoard.add(new ArrayList<>(Arrays.asList(Card.from(Card.CardType.EAGLE),Card.from(Card.CardType.RABBIT),Card.from(Card.CardType.ELK),Card.from(Card.CardType.FOX),Card.from(Card.CardType.WOLF))));
+
+        //player4
+
+
+        var emiCardBoard =new ArrayList<ArrayList<Card>>();
+        emiCardBoard.add(new ArrayList<>(Arrays.asList(Card.from(Card.CardType.WOLF),Card.from(Card.CardType.BEAR),Card.from(Card.CardType.FISH),Card.from(Card.CardType.FOX),Card.from(Card.CardType.FOX))));
+        emiCardBoard.add(new ArrayList<>(Arrays.asList(Card.from(Card.CardType.WOLF),Card.from(Card.CardType.BEE),Card.from(Card.CardType.MEADOW),Card.from(Card.CardType.EAGLE),Card.from(Card.CardType.RABBIT))));
+        emiCardBoard.add(new ArrayList<>(Arrays.asList(Card.from(Card.CardType.WOLF),Card.from(Card.CardType.MEADOW),Card.from(Card.CardType.MEADOW),Card.from(Card.CardType.MEADOW),Card.from(Card.CardType.ELK))));
+        emiCardBoard.add(new ArrayList<>(Arrays.asList(Card.from(Card.CardType.WOLF),Card.from(Card.CardType.ELK),Card.from(Card.CardType.MEADOW),Card.from(Card.CardType.BEE),Card.from(Card.CardType.FOX))));
+
+
+        var player1 = playerFabricMethod("Rodek",rodekCardBoard);
+        var player4 = playerFabricMethod("Emi",emiCardBoard);
+        var player2 = playerFabricMethod("Michal",michlCardBoard);
+        var player3 = playerFabricMethod("Tata",tataCardBoard);
+
+
+        GameTable gameTable = new GameTable(List.of(player1,player2,player3,player4));
+        List<GamePlayer> calculatedGamePlayers = gameTable.endGame();
+        assertEquals(player1.getSumOfPoints(),71);
+        assertEquals(player2.getSumOfPoints(),50);
+        assertEquals(player3.getSumOfPoints(),53);
+        assertEquals(player4.getSumOfPoints(),72);
+
+    }
     private GamePlayer playerFabricMethod(String name, ArrayList<ArrayList<Card>> cardBoard){
         var board = new Board();
         var player = new GamePlayer(name, board);
