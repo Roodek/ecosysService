@@ -11,6 +11,7 @@ import org.springframework.data.annotation.Id;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 
 @AllArgsConstructor
@@ -50,18 +51,21 @@ public class GameDto{
     }
 
     public GameDto startGame(){
-        players.forEach(player-> player.getCardsInHand().addAll(dealCards(11)));
+        players.forEach(player-> player.setCardsInHand(dealCards(11)));
         return this;
     }
 
     public GameDto startSecondPhase(){
-        players.forEach(player-> player.getCardsInHand().addAll(dealCards(10)));
+        players.forEach(player-> player.setCardsInHand(
+                Stream.concat(player.getCardsInHand().stream(),
+                        dealCards(10).stream()).toList())
+        );
         return this;
     }
 
     private List<PlayerCard> dealCards(int numberOfCards){
-        var cardsDealt = cardStack.subList(0,numberOfCards-1);
-        cardStack = cardStack.subList(numberOfCards,cardStack.size()-1);
+        var cardsDealt = cardStack.subList(0,numberOfCards);
+        cardStack = cardStack.subList(numberOfCards,cardStack.size());
         return cardsDealt;
     }
 }
