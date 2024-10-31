@@ -3,6 +3,7 @@ package com.eco.ecosystem.controllers;
 import com.eco.ecosystem.controllers.responseObjects.BasicGameResponse;
 import com.eco.ecosystem.dto.GameDto;
 import com.eco.ecosystem.dto.PlayerDto;
+import com.eco.ecosystem.entities.Message;
 import com.eco.ecosystem.entities.Player;
 import com.eco.ecosystem.services.GameService;
 import com.eco.ecosystem.services.PlayerService;
@@ -54,6 +55,13 @@ public class WebSocketController {
     @SendTo("/topic/public")
     public Mono<GameDto> endGame(@Payload UUID gameID) {
         return gameService.endGame(gameID);
+    }
+
+    @MessageMapping("/message") // Listens for messages sent to "/app/message"
+    @SendTo("/topic/messages")  // Sends responses to "/topic/messages" for subscribers
+    public Message receiveMessage(Message message) {
+        // Process and return the message (here we just return the received message)
+        return message;
     }
 
 
