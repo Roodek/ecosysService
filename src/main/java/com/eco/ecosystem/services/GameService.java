@@ -103,8 +103,9 @@ public class GameService {
         return null;
     }
 
-    public Mono<Void> startGame(UUID gameID) {
-        validateGameExistsAndGet(gameID).map(GameDto::startGame);
-        return Mono.empty();
+    public Mono<GameDto> startGame(UUID gameID) {
+        return validateGameExistsAndGet(gameID)
+                .flatMap(gameDto -> Mono.just(gameDto.startGame()));
+
     }
 }

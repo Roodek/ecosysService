@@ -2,9 +2,11 @@ package com.eco.ecosystem.controllers;
 
 import com.eco.ecosystem.controllers.requestBodies.PlayerNameBody;
 import com.eco.ecosystem.dto.GameDto;
+import com.eco.ecosystem.entities.Message;
 import com.eco.ecosystem.services.GameService;
 import com.eco.ecosystem.services.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -15,6 +17,8 @@ import java.util.UUID;
 @RequestMapping(path = "api/v1/games")
 public class GameController {
 
+    @Autowired
+    SimpMessagingTemplate simpMessagingTemplate;
     @Autowired
     private GameService gameService;
 
@@ -36,12 +40,14 @@ public class GameController {
     @PostMapping("/{id}/join")
     public Mono<UUID> joinGame(@PathVariable UUID id,
                                @RequestBody PlayerNameBody playerName ){
+        simpMessagingTemplate.convertAndSend("/topic/games", new Message(playerName.getPlayerName(),"joined"));
         return gameService.joinGame(id,playerName.getPlayerName());
     }
 
     @PostMapping("{id}/start")
     public Mono<Void> startGame(@PathVariable UUID id){
-        return gameService.startGame(id);
+        return gameService.startGame(id).then();
+
     }
     @GetMapping("/{id}")
     public Mono<GameDto> getGame(@PathVariable UUID id){

@@ -31,36 +31,19 @@ public class WebSocketController {
     @Autowired
     private PlayerService playerService;
 
-    @MessageMapping("/game/{gameID}/join")
-    @SendTo("/topic/public")
-    public Flux<BasicGameResponse> playerJoined(@DestinationVariable UUID gameID,
-                                                @Payload Player player,
-                                                SimpMessageHeaderAccessor headerAccessor) {
-        if (player != null)
-            headerAccessor.getSessionAttributes().put("player", player);
-        return gameService.getAllGames().map(gameDto -> new BasicGameResponse(gameDto.getId(),gameDto.getPlayers().stream().map(Player::getId).toList()));
 
-    }
-
-    @MessageMapping("/game/{gameID}/updateBoards")
-    public void updateBoards(@DestinationVariable UUID gameID) {
-        gameService.swapPlayerHands(gameID);
-        simpMessagingTemplate.convertAndSend("/specific/" + gameID.toString(),
-                playerService.getPlayers(gameID)
-                        .flatMap(players -> Mono.just(players.stream()
-                                .map(player -> new PlayerDto(player.getId(), player.getBoard())).toList())));
-    }
-
-    @MessageMapping("/game.endGame")
-    @SendTo("/topic/public")
-    public Mono<GameDto> endGame(@Payload UUID gameID) {
-        return gameService.endGame(gameID);
-    }
-
-    @MessageMapping("/message") // Listens for messages sent to "/app/message"
-    @SendTo("/topic/messages")  // Sends responses to "/topic/messages" for subscribers
+    @MessageMapping("/games") // Listens for messages sent to "/app/message"
+    @SendTo("/topic/games")  // Sends responses to "/topic/messages" for subscribers
     public Message receiveMessage(Message message) {
         // Process and return the message (here we just return the received message)
+        return message;
+    }
+
+    @MessageMapping("/games/{id}") // Listens for messages sent to "/app/message/{id}"
+    @SendTo("/topic/games/{id}")  // Sends responses to "/topic/messages/{id}" for subscribers
+    public Message receiveTargetedMessage(@DestinationVariable String id, @Payload Message message) {
+        // Process and return the message (here we just return the received message)
+        message.setContent(id+" : " +message.getContent());
         return message;
     }
 
