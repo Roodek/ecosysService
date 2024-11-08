@@ -15,11 +15,11 @@ import java.util.UUID;
 @NoArgsConstructor
 public class Player {
 
-    public static final String ID_FIELD ="id";
+    public static final String ID_FIELD ="_id";
     public static final String CARDS_IN_HAND_FIELD ="cardsInHand";
     public static final String BOARD_FIELD ="board";
     public static final String POINT_COUNT_FIELD ="pointCount";
-    @JsonProperty("id")
+    @JsonProperty("_id")
     private UUID id;
     @JsonProperty("name")
     private String name;
@@ -35,10 +35,4 @@ public class Player {
     public String toString() {
         return this.name+" - "+this.pointCount + " - "+this.cardsInHand;
     }
-
-//    public Board getAsCalculationBoard(){
-//        return new Board(board);
-//    }
-
-
 }

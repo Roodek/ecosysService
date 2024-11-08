@@ -93,6 +93,16 @@ public class GameService {
                 Mono.error(new FullPlayerCountException()));
     }
 
+    public Mono<Void> leaveGame(UUID gameID, UUID playerID) {
+        Query query = new Query(
+                Criteria.where(Game.ID_FIELD).is(gameID));
+        Update update = new Update().pull("players",new Query(Criteria.where(Player.ID_FIELD).is(playerID)));
+
+        return reactiveMongoTemplate.updateFirst(query, update, Game.class)
+                .then();
+    }
+
+
     private Mono<GameDto> validateGameExistsAndGet(UUID gameID) {
         return reactiveMongoTemplate.findById(gameID, Game.class)
                 .switchIfEmpty(Mono.error(new GameNotFoundException()))

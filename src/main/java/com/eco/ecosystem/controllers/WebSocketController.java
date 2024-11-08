@@ -1,10 +1,6 @@
 package com.eco.ecosystem.controllers;
 
-import com.eco.ecosystem.controllers.responseObjects.BasicGameResponse;
-import com.eco.ecosystem.dto.GameDto;
-import com.eco.ecosystem.dto.PlayerDto;
 import com.eco.ecosystem.entities.Message;
-import com.eco.ecosystem.entities.Player;
 import com.eco.ecosystem.services.GameService;
 import com.eco.ecosystem.services.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +11,8 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
-import java.util.UUID;
+import java.util.Map;
 
 @Controller
 public class WebSocketController {
@@ -45,6 +39,16 @@ public class WebSocketController {
         // Process and return the message (here we just return the received message)
         message.setContent(id+" : " +message.getContent());
         return message;
+    }
+
+    @MessageMapping("/updatePlayerId")
+    public void updatePlayerId(@Payload Map<String, String> payload, SimpMessageHeaderAccessor headerAccessor) {
+        String playerID = payload.get("playerID");
+        if (playerID != null) {
+            // Update the session attribute with the new playerID
+            headerAccessor.getSessionAttributes().put("playerID", playerID);
+            System.out.println("Updated session playerID to: " + playerID);
+        }
     }
 
 

@@ -1,6 +1,7 @@
 package com.eco.ecosystem.controllers;
 
 import com.eco.ecosystem.controllers.requestBodies.PlayerNameBody;
+import com.eco.ecosystem.controllers.requestBodies.PlayerUUIDBody;
 import com.eco.ecosystem.dto.GameDto;
 import com.eco.ecosystem.entities.Message;
 import com.eco.ecosystem.services.GameService;
@@ -42,6 +43,13 @@ public class GameController {
                                @RequestBody PlayerNameBody playerName ){
         simpMessagingTemplate.convertAndSend("/topic/games", new Message(playerName.getPlayerName(),"joined"));
         return gameService.joinGame(id,playerName.getPlayerName());
+    }
+
+    @PostMapping("/{id}/leave")
+    public Mono<Void> leaveGame(@PathVariable UUID id,
+                               @RequestBody PlayerUUIDBody playerUUIDBody ){
+        simpMessagingTemplate.convertAndSend("/topic/games", new Message(playerUUIDBody.getPlayerID(),"left"));
+        return gameService.leaveGame(id,UUID.fromString(playerUUIDBody.getPlayerID()));
     }
 
     @PostMapping("{id}/start")

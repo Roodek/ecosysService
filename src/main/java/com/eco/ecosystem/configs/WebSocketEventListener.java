@@ -23,7 +23,7 @@ public class WebSocketEventListener {
         String username = (String) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("player");
         if("status of game" != "started then"){
             //simply inform the players one left
-            messageTemplate.convertAndSend("/topic/public","player"+username+"left");
+            messageTemplate.convertAndSend("/topic/games","player"+username+"left");
         }
         if(username!=null){
             log.info("player: {} ruined the game:P",username);
