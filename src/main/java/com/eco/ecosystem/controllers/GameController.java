@@ -1,11 +1,11 @@
 package com.eco.ecosystem.controllers;
 
 import com.eco.ecosystem.controllers.requestBodies.PlayerNameBody;
-import com.eco.ecosystem.controllers.requestBodies.PlayerUUIDBody;
 import com.eco.ecosystem.dto.GameDto;
 import com.eco.ecosystem.entities.Message;
 import com.eco.ecosystem.services.GameService;
 import com.eco.ecosystem.services.PlayerService;
+import org.bson.json.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -47,9 +47,12 @@ public class GameController {
 
     @PostMapping("/{id}/leave")
     public Mono<Void> leaveGame(@PathVariable UUID id,
-                               @RequestBody PlayerUUIDBody playerUUIDBody ){
-        simpMessagingTemplate.convertAndSend("/topic/games", new Message(playerUUIDBody.getPlayerID(),"left"));
-        return gameService.leaveGame(id,UUID.fromString(playerUUIDBody.getPlayerID()));
+                               @RequestBody String playerUUIDBody ){
+        var jsonBody = new JsonObject(playerUUIDBody);
+        var playerID = jsonBody.toBsonDocument().getString("playerID").getValue();
+
+        simpMessagingTemplate.convertAndSend("/topic/games", new Message(playerID,"left"));
+        return gameService.leaveGame(id,UUID.fromString(playerID));
     }
 
     @PostMapping("{id}/start")

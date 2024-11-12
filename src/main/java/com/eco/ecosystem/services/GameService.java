@@ -3,8 +3,6 @@ package com.eco.ecosystem.services;
 import com.eco.ecosystem.dto.GameDto;
 import com.eco.ecosystem.entities.Game;
 import com.eco.ecosystem.entities.Player;
-import com.eco.ecosystem.entities.PlayerCard;
-import com.eco.ecosystem.game.CardStack;
 import com.eco.ecosystem.game.exceptions.FullPlayerCountException;
 import com.eco.ecosystem.game.exceptions.GameNotFoundException;
 import com.eco.ecosystem.repository.GameRepository;
@@ -71,8 +69,7 @@ public class GameService {
 
     public Mono<UUID> initGame(String playerName) {
         var newId = UUID.randomUUID();
-        var player = new Player(UUID.randomUUID(), playerName, List.of(), List.of(List.of()), 0);
-        var newGame = Mono.just(new GameDto(newId, List.of(player), CardStack.initCardStack().stream().map(PlayerCard::new).toList(), 0));
+        var newGame = Mono.just(new GameDto(newId, List.of(), List.of(), 0));
         return newGame.map(AppUtils::gameDtoToEntity)
                 .flatMap(gameRepository::insert)
                 .then(Mono.just(newId));
@@ -85,7 +82,7 @@ public class GameService {
                 Criteria.where(Game.ID_FIELD).is(gameID));
         Update update = new Update()
                 .push(Game.PLAYERS_FIELD, newPlayer);
-
+        System.out.println("player: "+newPlayeruuid+" joined");
         return validateGameExistsAndGet(gameID).flatMap(gameDto -> gameDto.getPlayers().size() < 6 ?
                 reactiveMongoTemplate.updateFirst(query, update, Game.class)
                         .flatMap(updateResult -> updateResult.getMatchedCount() == 0 ?
@@ -94,9 +91,10 @@ public class GameService {
     }
 
     public Mono<Void> leaveGame(UUID gameID, UUID playerID) {
+        System.out.println("player: " + playerID+" left");
         Query query = new Query(
                 Criteria.where(Game.ID_FIELD).is(gameID));
-        Update update = new Update().pull("players",new Query(Criteria.where(Player.ID_FIELD).is(playerID)));
+        Update update = new Update().pull("players", new Query(Criteria.where(Player.ID_FIELD).is(playerID)));
 
         return reactiveMongoTemplate.updateFirst(query, update, Game.class)
                 .then();
@@ -115,7 +113,8 @@ public class GameService {
 
     public Mono<GameDto> startGame(UUID gameID) {
         return validateGameExistsAndGet(gameID)
-                .flatMap(gameDto -> Mono.just(gameDto.startGame()));
+                .flatMap(gameDto -> Mono.just(gameDto.startGame()))
+                .flatMap(gameDto -> updateGame(gameDto, gameID));
 
     }
 }

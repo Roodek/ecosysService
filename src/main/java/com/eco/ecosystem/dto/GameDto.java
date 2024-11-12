@@ -51,6 +51,7 @@ public class GameDto{
     }
 
     public GameDto startGame(){
+
         players.forEach(player-> player.setCardsInHand(dealCards(11)));
         return this;
     }
