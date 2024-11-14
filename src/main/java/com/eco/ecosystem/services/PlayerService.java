@@ -3,6 +3,7 @@ package com.eco.ecosystem.services;
 import com.eco.ecosystem.controllers.requestBodies.PlayerUpdateRequestBody;
 import com.eco.ecosystem.controllers.requestBodies.PutCardRequestBody;
 import com.eco.ecosystem.controllers.responseObjects.AvailableMovesResponse;
+import com.eco.ecosystem.dto.GameDto;
 import com.eco.ecosystem.entities.Game;
 import com.eco.ecosystem.entities.Player;
 import com.eco.ecosystem.entities.PlayerCard;
@@ -30,6 +31,9 @@ public class PlayerService {
 
     @Autowired
     ReactiveMongoTemplate reactiveMongoTemplate;
+
+    @Autowired
+    GameService gameService;
 
     public Mono<UpdateResult> updatePlayersHand(UUID gameID, UUID playerID, PlayerUpdateRequestBody player) {
         Query query = getPlayerQuery(gameID, playerID);
@@ -71,17 +75,17 @@ public class PlayerService {
                                 new BoardAvailableMoveCalculator(new Board(player.getBoard()))
                                         .getAvailableMoves().stream().toList())
                 ));
-
-
     }
 
     public Mono<List<List<PlayerCard>>> putCard(UUID gameID, UUID playerID, PutCardRequestBody body) {
         return getPlayer(gameID, playerID)
-                .flatMap(player -> putCardOnPlayersBoard(gameID, playerID, body, player));
+                .flatMap(player -> putCardOnPlayersBoard(gameID, playerID, body, player)
+                        .flatMap(board -> gameService.updateGameStateIfTurnEnded(gameID).ignoreElement()
+                                .then(Mono.just(board))));
     }
 
     private Mono<List<List<PlayerCard>>> putCardOnPlayersBoard(UUID gameID, UUID playerID, PutCardRequestBody body, Player player) {
-        if(!isMoveAvailable(player,new PlayerCard(body.getCardType().toString()), body.getSlot())){
+        if (!isMoveAvailable(player, new PlayerCard(body.getCardType().toString()), body.getSlot())) {
             return Mono.error(new InvalidMoveException("Move invalid"));
         }
         try {
@@ -92,8 +96,8 @@ public class PlayerService {
                             body.getSlot().coordY()
                     ).toResponseBoard();
             Update update = new Update()
-                    .set(Game.PLAYERS_FIELD + ".$." + Player.BOARD_FIELD,updatedBoard)
-                    .set(Game.PLAYERS_FIELD + ".$." + Player.CARDS_IN_HAND_FIELD,removeCardFromPlayersHand(player,body.getCardType()));
+                    .set(Game.PLAYERS_FIELD + ".$." + Player.BOARD_FIELD, updatedBoard)
+                    .set(Game.PLAYERS_FIELD + ".$." + Player.CARDS_IN_HAND_FIELD, removeCardFromPlayersHand(player, body.getCardType()));
 
             return reactiveMongoTemplate.updateFirst(getPlayerQuery(gameID, playerID), update, Game.class).then(Mono.just(updatedBoard));
         } catch (InvalidMoveException e) {
@@ -101,17 +105,17 @@ public class PlayerService {
         }
     }
 
-    private Boolean isMoveAvailable(Player player, PlayerCard card, Slot slot){
+    private Boolean isMoveAvailable(Player player, PlayerCard card, Slot slot) {
         return new BoardAvailableMoveCalculator(new Board(player.getBoard()))
                 .getAvailableMoves().stream().toList().contains(slot)
                 && player.getCardsInHand().stream().map(PlayerCard::getCardType).toList().contains(card.getCardType());
     }
 
-    private List<PlayerCard> removeCardFromPlayersHand(Player player, Card.CardType card){
+    private List<PlayerCard> removeCardFromPlayersHand(Player player, Card.CardType card) {
         var result = new ArrayList<>(player.getCardsInHand());
         Iterator<PlayerCard> itr = result.iterator();
-        while(itr.hasNext()) {
-            if(itr.next().getCardType().equals(card.toString())) {
+        while (itr.hasNext()) {
+            if (itr.next().getCardType().equals(card.toString())) {
                 itr.remove();
                 break;
             }

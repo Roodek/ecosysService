@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import static com.eco.ecosystem.services.GameService.HALF_GAME_TURN;
+
 
 @AllArgsConstructor
 @Setter
@@ -30,8 +32,15 @@ public class GameDto{
     @JsonProperty("turn")
     int turn;
 
+    public GameDto(GameDto gameDto) {
+        this.id = gameDto.getId();
+        this.players = gameDto.getPlayers();
+        this.cardStack = gameDto.cardStack;
+        this.turn = gameDto.turn;
+    }
+
     public GameDto swapPlayersHands() {
-        if (turn < 10) {
+        if (turn < HALF_GAME_TURN) {
             List<PlayerCard> swapped = players.get(0).getCardsInHand();
             List<PlayerCard> buffer;
             for (int i = players.size() - 1; i >= 0; i--) {

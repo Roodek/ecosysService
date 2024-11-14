@@ -1,4 +1,4 @@
-package scenarioTest;
+package service;
 
 import com.eco.ecosystem.entities.Game;
 import com.eco.ecosystem.entities.Player;
@@ -18,7 +18,6 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -27,14 +26,10 @@ import static org.mockito.Mockito.when;
 
 
 @ExtendWith(MockitoExtension.class)
-public class PlayerScenarioTest {
+public class PlayerServiceTest extends ServiceTest{
 
-    private UUID gameID = UUID.randomUUID();
-    private UUID playerID = UUID.randomUUID();
     private Player player;
     private List<PlayerCard> hand;
-    private Game game;
-
     @Mock
     ReactiveMongoTemplate reactiveMongoTemplate;
 
@@ -62,12 +57,12 @@ public class PlayerScenarioTest {
                 hand,
                 board,
         0);
-        game = new Game(gameID, List.of(player), List.of(), 4);
+
     }
 
     @Test
     void shouldProperlyReturnAvailableMoves() {
-
+        var game = new Game(gameID, List.of(player), List.of(), 4);
         when(reactiveMongoTemplate.findOne(any(), any())).thenReturn(Mono.just(game));
         var availableMoves = playerService.getAvailableMoves(gameID, playerID).block();
         var expectedListOfAvailableSlots = List.of(

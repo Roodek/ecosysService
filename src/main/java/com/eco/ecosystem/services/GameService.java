@@ -26,6 +26,7 @@ import java.util.UUID;
 @Service
 public class GameService {
 
+    public static final int HALF_GAME_TURN = 10;
     @Autowired
     SimpMessagingTemplate simpMessagingTemplate;
     @Autowired
@@ -127,7 +128,6 @@ public class GameService {
         return validateGameExistsAndGet(gameID)
                 .flatMap(gameDto -> Mono.just(gameDto.startGame()))
                 .flatMap(gameDto -> updateGame(gameDto, gameID));
-
     }
 
     public Mono<GameDto> getGameForSpecificPlayer(UUID gameID, UUID playerID) {
@@ -138,5 +138,27 @@ public class GameService {
                             .forEach(player -> player.setCardsInHand(List.of()));
                     return Mono.just(gameDto);
                 });
+    }
+
+    public Mono<GameDto> updateGameStateIfTurnEnded(UUID gameID) {
+        return getGame(gameID)
+                .flatMap(gameDto -> arePlayerHandsEqualInSize(gameDto.getPlayers()) ?
+                        startNewTurn(gameDto) :
+                        Mono.just(gameDto));
+    }
+
+    private Mono<GameDto> startNewTurn(GameDto gameDto){
+        var gameCopy = new GameDto(gameDto);
+        if(gameCopy.getTurn()==HALF_GAME_TURN){
+            gameCopy.startSecondPhase();
+        }
+        gameCopy.setTurn(gameCopy.getTurn()+1);
+        gameCopy.swapPlayersHands();
+        return updateGame(gameCopy,gameCopy.getId());
+    }
+
+    private boolean arePlayerHandsEqualInSize(List<Player> players) {
+        var expectedSize = players.get(0).getCardsInHand().size();
+        return players.stream().allMatch(player -> player.getCardsInHand().size() == expectedSize);
     }
 }
