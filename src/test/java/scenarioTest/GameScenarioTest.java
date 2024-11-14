@@ -51,36 +51,38 @@ public class GameScenarioTest extends ScenarioTest {
     @Test
     void testInitGame() throws IOException {
         var playerNameBody = new PlayerNameBody("player1");
-        var response = createInitGameRequest(playerNameBody);
+        var response = createInitGameRequest();
         assertEquals(200,response.code());
         var allGamesResponse = createGetAllGamesRequest();
         ArrayList<GameDto> allGames = new ObjectMapper().readValue(allGamesResponse.body().string(), new TypeReference<List<GameDto>>(){});
         var game = allGames.get(0);
         assertEquals(200,allGamesResponse.code());
         assertEquals(1,allGames.size());
-        assertEquals(1,game.getPlayers().size());
-        assertEquals("player1",game.getPlayers().get(0).getName());
-        assertEquals(130, game.getCardStack().size());
+        assertEquals(0, game.getCardStack().size());
     }
 
     @Test
     void testInitGameAndJoin() throws IOException {
         var playerNameBody1 = new PlayerNameBody("player1");
         var playerNameBody2 = new PlayerNameBody("player2");
-        var createInitGameResponse = createInitGameRequest(playerNameBody1);
+        var createInitGameResponse = createInitGameRequest();
         assertEquals(200,createInitGameResponse.code());
         var allGamesResponse = createGetAllGamesRequest();
         ArrayList<GameDto> allGames = new ObjectMapper().readValue(allGamesResponse.body().string(), new TypeReference<List<GameDto>>(){});
         var game = allGames.get(0);
         assertEquals(200,allGamesResponse.code());
         assertEquals(1,allGames.size());
-        assertEquals(1,game.getPlayers().size());
-        assertEquals("player1",game.getPlayers().get(0).getName());
-        assertEquals(130, game.getCardStack().size());
+        assertEquals(0,game.getPlayers().size());
+        assertEquals(0, game.getCardStack().size());
+
         var gameId = new ObjectMapper().readValue(createInitGameResponse.body().string(), String.class);
-        var joinGameResponse = createJoinGameRequest(gameId,playerNameBody2);
-        assertEquals(200,joinGameResponse.code());
-        assertNotNull(UUID.fromString( new ObjectMapper().readValue(joinGameResponse.body().string(), String.class)));
+        var joinGameResponse1 = createJoinGameRequest(gameId,playerNameBody1);
+        assertEquals(200,joinGameResponse1.code());
+        assertNotNull(UUID.fromString( new ObjectMapper().readValue(joinGameResponse1.body().string(), String.class)));
+
+        var joinGameResponse2 = createJoinGameRequest(gameId,playerNameBody2);
+        assertEquals(200,joinGameResponse2.code());
+        assertNotNull(UUID.fromString( new ObjectMapper().readValue(joinGameResponse2.body().string(), String.class)));
 
         allGamesResponse = createGetAllGamesRequest();
         allGames = new ObjectMapper().readValue(allGamesResponse.body().string(), new TypeReference<List<GameDto>>(){});

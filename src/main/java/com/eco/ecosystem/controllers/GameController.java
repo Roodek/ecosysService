@@ -25,53 +25,63 @@ public class GameController {
 
     @Autowired
     private PlayerService playerService;
+
     @GetMapping
-    public Flux<GameDto> getGames(){
+    public Flux<GameDto> getGames() {
         return gameService.getAllGames();
     }
+
     @PostMapping
-    public Mono<GameDto> saveGame(@RequestBody Mono<GameDto> gameDtoMono){
+    public Mono<GameDto> saveGame(@RequestBody Mono<GameDto> gameDtoMono) {
         return gameService.saveGame(gameDtoMono);
     }
 
     @PostMapping("/new")
-    public Mono<UUID> initGame(@RequestBody PlayerNameBody playerName){
-        return gameService.initGame(playerName.getPlayerName());
+    public Mono<UUID> initGame() {
+        simpMessagingTemplate.convertAndSend("/topic/games", new Message("game", "created"));
+        return gameService.initGame();
     }
+
     @PostMapping("/{id}/join")
     public Mono<UUID> joinGame(@PathVariable UUID id,
-                               @RequestBody PlayerNameBody playerName ){
-        simpMessagingTemplate.convertAndSend("/topic/games", new Message(playerName.getPlayerName(),"joined"));
-        return gameService.joinGame(id,playerName.getPlayerName());
+                               @RequestBody PlayerNameBody playerName) {
+        simpMessagingTemplate.convertAndSend("/topic/games", new Message(playerName.getPlayerName(), "joined"));
+        simpMessagingTemplate.convertAndSend("/topic/games/" + id.toString(), new Message(playerName.getPlayerName(), "joined"));
+        return gameService.joinGame(id, playerName.getPlayerName());
     }
 
     @PostMapping("/{id}/leave")
     public Mono<Void> leaveGame(@PathVariable UUID id,
-                               @RequestBody String playerUUIDBody ){
+                                @RequestBody String playerUUIDBody) {
         var jsonBody = new JsonObject(playerUUIDBody);
         var playerID = jsonBody.toBsonDocument().getString("playerID").getValue();
-
-        simpMessagingTemplate.convertAndSend("/topic/games", new Message(playerID,"left"));
-        return gameService.leaveGame(id,UUID.fromString(playerID));
+        simpMessagingTemplate.convertAndSend("/topic/games/" + id.toString(), new Message(playerID, "left"));
+        simpMessagingTemplate.convertAndSend("/topic/games", new Message(playerID, "left"));
+        return gameService.leaveGame(id, UUID.fromString(playerID));
     }
 
     @PostMapping("{id}/start")
-    public Mono<Void> startGame(@PathVariable UUID id){
-        return gameService.startGame(id).then();
+    public Mono<Void> startGame(@PathVariable UUID id) {
+        return gameService.startGame(id).then(Mono.fromRunnable(() -> {
+            simpMessagingTemplate.convertAndSend("/topic/games", new Message(id.toString(), "game started"));
+            simpMessagingTemplate.convertAndSend("/topic/games/" + id, new Message(id.toString(), "GAME_STARTED"));
+        }));
 
     }
+
     @GetMapping("/{id}")
-    public Mono<GameDto> getGame(@PathVariable UUID id){
+    public Mono<GameDto> getGame(@PathVariable UUID id) {
         return gameService.getGame(id);
+    }
+    @GetMapping("/{gameID}/{playerID}")
+    public Mono<GameDto> getGameForSpecificPlayer(@PathVariable UUID gameID, @PathVariable UUID playerID) {
+        return gameService.getGameForSpecificPlayer(gameID,playerID);
     }
 
     @DeleteMapping("/delete/{id}")
-    public Mono<Void> deleteGame(@PathVariable UUID id){
+    public Mono<Void> deleteGame(@PathVariable UUID id) {
         return gameService.deleteGame(id);
     }
-
-
-
 
 
 }

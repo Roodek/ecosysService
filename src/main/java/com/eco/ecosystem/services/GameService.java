@@ -2,10 +2,12 @@ package com.eco.ecosystem.services;
 
 import com.eco.ecosystem.dto.GameDto;
 import com.eco.ecosystem.entities.Game;
+import com.eco.ecosystem.entities.Message;
 import com.eco.ecosystem.entities.Player;
 import com.eco.ecosystem.game.exceptions.FullPlayerCountException;
 import com.eco.ecosystem.game.exceptions.GameNotFoundException;
 import com.eco.ecosystem.repository.GameRepository;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.FindAndReplaceOptions;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -67,7 +69,7 @@ public class GameService {
         return gameRepository.deleteById(id);
     }
 
-    public Mono<UUID> initGame(String playerName) {
+    public Mono<UUID> initGame() {
         var newId = UUID.randomUUID();
         var newGame = Mono.just(new GameDto(newId, List.of(), List.of(), 0));
         return newGame.map(AppUtils::gameDtoToEntity)
@@ -82,7 +84,7 @@ public class GameService {
                 Criteria.where(Game.ID_FIELD).is(gameID));
         Update update = new Update()
                 .push(Game.PLAYERS_FIELD, newPlayer);
-        System.out.println("player: "+newPlayeruuid+" joined");
+        System.out.println("player: " + newPlayeruuid + " joined");
         return validateGameExistsAndGet(gameID).flatMap(gameDto -> gameDto.getPlayers().size() < 6 ?
                 reactiveMongoTemplate.updateFirst(query, update, Game.class)
                         .flatMap(updateResult -> updateResult.getMatchedCount() == 0 ?
@@ -91,13 +93,23 @@ public class GameService {
     }
 
     public Mono<Void> leaveGame(UUID gameID, UUID playerID) {
-        System.out.println("player: " + playerID+" left");
+        System.out.println("player: " + playerID + " left");
         Query query = new Query(
                 Criteria.where(Game.ID_FIELD).is(gameID));
         Update update = new Update().pull("players", new Query(Criteria.where(Player.ID_FIELD).is(playerID)));
 
         return reactiveMongoTemplate.updateFirst(query, update, Game.class)
-                .then();
+                .then(deleteGameIfNoPlayersLeft(gameID));
+    }
+
+    @NotNull
+    private Mono<Void> deleteGameIfNoPlayersLeft(UUID gameID) {
+        return validateGameExistsAndGet(gameID)
+                .flatMap(gameDto -> gameDto.getPlayers().isEmpty() ?
+                        deleteGame(gameID)
+                                .then(Mono.fromRunnable(() -> simpMessagingTemplate.convertAndSend("/topic/games",
+                                        new Message(gameID.toString(), "game deleted"))))
+                        : Mono.empty().then());
     }
 
 
@@ -116,5 +128,15 @@ public class GameService {
                 .flatMap(gameDto -> Mono.just(gameDto.startGame()))
                 .flatMap(gameDto -> updateGame(gameDto, gameID));
 
+    }
+
+    public Mono<GameDto> getGameForSpecificPlayer(UUID gameID, UUID playerID) {
+        return validateGameExistsAndGet(gameID)
+                .flatMap(gameDto -> {
+                    gameDto.getPlayers().stream()
+                            .filter(player -> player.getId() != playerID)
+                            .forEach(player -> player.setCardsInHand(List.of()));
+                    return Mono.just(gameDto);
+                });
     }
 }

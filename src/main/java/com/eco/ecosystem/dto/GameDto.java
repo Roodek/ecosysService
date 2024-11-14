@@ -2,6 +2,7 @@ package com.eco.ecosystem.dto;
 
 import com.eco.ecosystem.entities.Player;
 import com.eco.ecosystem.entities.PlayerCard;
+import com.eco.ecosystem.game.CardStack;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -51,7 +52,8 @@ public class GameDto{
     }
 
     public GameDto startGame(){
-
+        cardStack = CardStack.initCardStack().stream().map(PlayerCard::new).toList();
+        turn=1;
         players.forEach(player-> player.setCardsInHand(dealCards(11)));
         return this;
     }

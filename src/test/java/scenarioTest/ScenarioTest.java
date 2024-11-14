@@ -79,11 +79,10 @@ public class ScenarioTest {
         return client.newCall(request).execute();
     }
 
-    Response createInitGameRequest(PlayerNameBody requestBody) throws IOException {
+    Response createInitGameRequest() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        String jsonString = objectMapper.writeValueAsString(requestBody);
         Request request = new Request.Builder().url(new URL(getUrlRoot() + "/games/new"))
-                .post(RequestBody.create(jsonString, JSON)).build();
+                .post(RequestBody.create("",JSON)).build();
         return client.newCall(request).execute();
     }
 

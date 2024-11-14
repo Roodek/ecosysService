@@ -4,6 +4,7 @@ package com.eco.ecosystem.controllers;
 import com.eco.ecosystem.controllers.requestBodies.PlayerUpdateRequestBody;
 import com.eco.ecosystem.controllers.requestBodies.PutCardRequestBody;
 import com.eco.ecosystem.controllers.responseObjects.AvailableMovesResponse;
+import com.eco.ecosystem.entities.Player;
 import com.eco.ecosystem.entities.PlayerCard;
 import com.eco.ecosystem.services.PlayerService;
 import com.mongodb.client.result.UpdateResult;
@@ -27,6 +28,10 @@ public class PlayerController {
                                            @RequestBody PlayerUpdateRequestBody body){
 
         return playerService.updatePlayersHand(gameID,playerID,body);
+    }
+    @GetMapping(path = "/{gameID}/{playerID}")
+    public Mono<Player> getPlayer(@PathVariable UUID gameID, @PathVariable UUID playerID){
+        return playerService.getPlayer(gameID,playerID);
     }
     @GetMapping(path = "/{gameID}/{playerID}/availableMoves")
     public Mono<AvailableMovesResponse> getAvailableMoves(@PathVariable UUID gameID, @PathVariable UUID playerID){

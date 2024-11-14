@@ -40,16 +40,4 @@ public class WebSocketController {
         message.setContent(id+" : " +message.getContent());
         return message;
     }
-
-    @MessageMapping("/updatePlayerId")
-    public void updatePlayerId(@Payload Map<String, String> payload, SimpMessageHeaderAccessor headerAccessor) {
-        String playerID = payload.get("playerID");
-        if (playerID != null) {
-            // Update the session attribute with the new playerID
-            headerAccessor.getSessionAttributes().put("playerID", playerID);
-            System.out.println("Updated session playerID to: " + playerID);
-        }
-    }
-
-
 }

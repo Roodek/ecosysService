@@ -18,4 +18,9 @@ public class PlayerCard {
     public PlayerCard(Card card){
         this.cardType = card.toString();
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj.getClass()==this.getClass() && ((PlayerCard) obj).getCardType().equals(cardType);
+    }
 }

@@ -23,38 +23,43 @@ public class Board {
     private int wolfCount = 0;
     private List<List<Card>> cardBoard = new ArrayList<>();
 
-    public Board() {}
+    public Board() {
+    }
 
-    public List<List<PlayerCard>> toResponseBoard(){
-        return cardBoard.stream().map(row->row.stream().map(elem->elem==null?null:new PlayerCard(elem.getType().toString())).toList()).toList();
+    public List<List<PlayerCard>> toResponseBoard() {
+        return cardBoard.stream().map(row -> row.stream().map(elem -> elem == null ? null : new PlayerCard(elem.getType().toString())).toList()).toList();
     }
-    public Board(List<List<PlayerCard>> playersCardBoard){
-            this.cardBoard = new ArrayList<>(playersCardBoard.stream().map(row-> new ArrayList<>(row.stream().filter(Objects::nonNull).map(playerCard->{
-                try {
-                    return Card.fromString(playerCard.getCardType());
-                } catch (InvalidCardTypeException e) {
-                    throw new RuntimeException(e);
-                }
-            }).toList())).toList());
-            readVerticalAndHorizontalSizeFromDBCardBoard(playersCardBoard);
+
+    public Board(List<List<PlayerCard>> playersCardBoard) {
+        this.cardBoard = new ArrayList<>(playersCardBoard.stream()
+                .map(row -> new ArrayList<>(row.stream()
+                        .map(playerCard -> {
+                            try {
+                                return playerCard==null?null:Card.fromString(playerCard.getCardType());
+                            } catch (InvalidCardTypeException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }).toList())).toList());
+        readVerticalAndHorizontalSizeFromDBCardBoard(playersCardBoard);
     }
-    private void readVerticalAndHorizontalSizeFromDBCardBoard(List<List<PlayerCard>> playersCardBoard){
-        if (playersCardBoard.get(0).stream().allMatch(Objects::isNull)){
-            this.sizeVertical = playersCardBoard.size()-2;
-        }else{
+
+    private void readVerticalAndHorizontalSizeFromDBCardBoard(List<List<PlayerCard>> playersCardBoard) {
+        if (playersCardBoard.get(0).stream().allMatch(Objects::isNull)) {
+            this.sizeVertical = playersCardBoard.size() - 2;
+        } else {
             this.sizeVertical = playersCardBoard.size();
-            if(this.sizeVertical==5){
-                this.maxVerticalSize=5;
-                this.maxHorizontalSize=4;
+            if (this.sizeVertical == 5) {
+                this.maxVerticalSize = 5;
+                this.maxHorizontalSize = 4;
             }
         }
-        if(playersCardBoard.stream().map(row->row.get(0)).allMatch(Objects::isNull)){
-            this.sizeHorizontal = playersCardBoard.get(0).size()-2;
-        }else{
+        if (playersCardBoard.stream().map(row -> row.get(0)).allMatch(Objects::isNull)) {
+            this.sizeHorizontal = playersCardBoard.get(0).size() - 2;
+        } else {
             this.sizeHorizontal = playersCardBoard.get(0).size();
-            if(this.sizeHorizontal==5){
-                this.maxHorizontalSize=5;
-                this.maxVerticalSize=4;
+            if (this.sizeHorizontal == 5) {
+                this.maxHorizontalSize = 5;
+                this.maxVerticalSize = 4;
             }
         }
 
@@ -125,10 +130,10 @@ public class Board {
         return this;
     }
 
-    public void rabbitSwap(Slot card1,Slot card2){
+    public void rabbitSwap(Slot card1, Slot card2) {
         Card cardAtFirstSlot = getCardAtSlot(card1);
-        cardBoard.get(card1.coordX()).set(card1.coordY(),getCardAtSlot(card2));
-        cardBoard.get(card2.coordX()).set(card2.coordY(),cardAtFirstSlot);
+        cardBoard.get(card1.coordX()).set(card1.coordY(), getCardAtSlot(card2));
+        cardBoard.get(card2.coordX()).set(card2.coordY(), cardAtFirstSlot);
     }
 
     private boolean isBoardCompleted() {

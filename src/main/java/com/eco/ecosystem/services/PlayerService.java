@@ -76,7 +76,8 @@ public class PlayerService {
     }
 
     public Mono<List<List<PlayerCard>>> putCard(UUID gameID, UUID playerID, PutCardRequestBody body) {
-        return getPlayer(gameID, playerID).flatMap(player -> putCardOnPlayersBoard(gameID, playerID, body, player));
+        return getPlayer(gameID, playerID)
+                .flatMap(player -> putCardOnPlayersBoard(gameID, playerID, body, player));
     }
 
     private Mono<List<List<PlayerCard>>> putCardOnPlayersBoard(UUID gameID, UUID playerID, PutCardRequestBody body, Player player) {
