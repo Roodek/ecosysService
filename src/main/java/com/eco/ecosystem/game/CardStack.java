@@ -25,6 +25,7 @@ public class CardStack {
     //bees x8
     //eagles x8
     //rabbits x8
+    //sum: 130
 
     public static List<Card> initCardStack(){
         var cards = new LinkedList<Card>();

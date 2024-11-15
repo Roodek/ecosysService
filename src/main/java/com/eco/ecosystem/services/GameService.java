@@ -39,7 +39,9 @@ public class GameService {
     }
 
     public Mono<GameDto> getGame(UUID id) {
-        return gameRepository.findById(id).map(AppUtils::gameEntityToDto);
+        Query query = new Query(
+                Criteria.where(Game.ID_FIELD).is(id));
+        return reactiveMongoTemplate.findOne(query, Game.class).map(AppUtils::gameEntityToDto);
     }
 
     public Mono<GameDto> saveGame(Mono<GameDto> productDtoMono) {
@@ -143,7 +145,11 @@ public class GameService {
     public Mono<GameDto> updateGameStateIfTurnEnded(UUID gameID) {
         return getGame(gameID)
                 .flatMap(gameDto -> arePlayerHandsEqualInSize(gameDto.getPlayers()) ?
-                        startNewTurn(gameDto) :
+                        startNewTurn(gameDto)
+                                .map(updatedGame->{
+                                    simpMessagingTemplate.convertAndSend("/topic/games/" + gameID.toString(), new Message(gameID.toString(), "TURN_ENDED"));
+                                    return updatedGame;
+                                }) :
                         Mono.just(gameDto));
     }
 
