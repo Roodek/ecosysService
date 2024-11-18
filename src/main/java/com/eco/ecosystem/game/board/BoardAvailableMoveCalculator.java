@@ -15,8 +15,12 @@ public class BoardAvailableMoveCalculator {
     }
 
     public Set<Slot> getAvailableMoves() {
-        BoardSlotProcessor.iterateOverBoardEntriesAndApplyStrategy(board.getCardBoard(),availableMovesProcessor);
-        return availableMovesProcessor.getAvailableMoves();
+        if (board.getSizeHorizontal() == 0 || board.getSizeVertical() == 0) {
+            return Set.of(new Slot(0, 0));
+        } else {
+            BoardSlotProcessor.iterateOverBoardEntriesAndApplyStrategy(board.getCardBoard(), availableMovesProcessor);
+            return availableMovesProcessor.getAvailableMoves();
+        }
     }
 
 }

@@ -1,5 +1,7 @@
 package com.eco.ecosystem.game.board;
 
+import lombok.Getter;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,10 +13,7 @@ public class CheckSlotsAvailabilityStrategy implements ProcessSlotStrategy {
 
     private Board board;
 
-    public Set<Slot> getAvailableMoves() {
-        return availableMoves;
-    }
-
+    @Getter
     private Set<Slot> availableMoves = new HashSet<>();
     @Override
     public void processSlotAndWithItsNeighbours(Slot targetSlot, NeighborSlots neighbours) {

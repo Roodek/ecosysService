@@ -136,7 +136,7 @@ public class GameService {
         return validateGameExistsAndGet(gameID)
                 .flatMap(gameDto -> {
                     gameDto.getPlayers().stream()
-                            .filter(player -> player.getId() != playerID)
+                            .filter(player -> !player.getId().equals(playerID))
                             .forEach(player -> player.setCardsInHand(List.of()));
                     return Mono.just(gameDto);
                 });

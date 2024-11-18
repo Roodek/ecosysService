@@ -16,8 +16,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 class BoardTest {
 
@@ -31,6 +30,22 @@ class BoardTest {
     void finalizeWith(){
         board.printBoard();
         System.out.println();
+    }
+
+    @Test
+    void constructorFromEmptyBoard(){
+        var board1 = new Board(List.of(List.of()));
+        assertEquals(0,board1.getSizeVertical());
+        assertEquals(0,board1.getSizeHorizontal());
+    }
+
+    @Test
+    void putOnFirstCard() throws InvalidMoveException {
+        var board1 = new Board(List.of(List.of()));
+        assertEquals(0,board1.getSizeVertical());
+        assertEquals(0,board1.getSizeHorizontal());
+        board1.putCard(Card.from(Card.CardType.FOX),0,0);
+        assertTrue(board1.getCardBoard().get(1).get(1).getType()== Card.CardType.FOX);
     }
 
     @Test
@@ -70,9 +85,6 @@ class BoardTest {
         assertEquals(3,board2.getSizeHorizontal());
         assertEquals(5,board2.getMaxHorizontalSize());
         assertEquals(5,board2.getMaxVerticalSize());
-
-
-
     }
     @Test
     void putCardAtCoordinates() throws InvalidMoveException {

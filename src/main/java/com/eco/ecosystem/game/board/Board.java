@@ -44,6 +44,9 @@ public class Board {
     }
 
     private void readVerticalAndHorizontalSizeFromDBCardBoard(List<List<PlayerCard>> playersCardBoard) {
+        if(playersCardBoard.size()==1 && playersCardBoard.get(0).isEmpty()){
+            return;
+        }
         if (playersCardBoard.get(0).stream().allMatch(Objects::isNull)) {
             this.sizeVertical = playersCardBoard.size() - 2;
         } else {
@@ -95,7 +98,7 @@ public class Board {
         if (isBoardCompleted()) {
             throw new InvalidMoveException("Invalid move, board is already completed");
         }
-        if (cardBoard.isEmpty()) {
+        if (cardBoard.isEmpty() || cardBoard.get(0).isEmpty()) {
             initBoard();
             cardBoard.get(1).set(1, card);
             sizeVertical++;
@@ -172,12 +175,14 @@ public class Board {
     }
 
     private void initBoard() {
+        List<List<Card>> newBoard = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
-            cardBoard.add(new ArrayList<>());
+            newBoard.add(new ArrayList<>());
             for (int j = 0; j < 3; j++) {
-                cardBoard.get(i).add(null);
+                newBoard.get(i).add(null);
             }
         }
+        this.cardBoard = newBoard;
     }
 
     private void assignNeighbours() {

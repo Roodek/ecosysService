@@ -16,28 +16,28 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(path = "api/v1/players")
+@RequestMapping(path = "api/v1/games/{gameID}/players")
 public class PlayerController {
 
     @Autowired
     PlayerService playerService;
 
-    @PostMapping(path = "/{gameID}/{playerID}")
+    @PostMapping(path = "/{playerID}")
     public Mono<UpdateResult> updatePlayer(@PathVariable UUID gameID,
                                            @PathVariable UUID playerID,
                                            @RequestBody PlayerUpdateRequestBody body){
 
         return playerService.updatePlayersHand(gameID,playerID,body);
     }
-    @GetMapping(path = "/{gameID}/{playerID}")
+    @GetMapping(path = "/{playerID}")
     public Mono<Player> getPlayer(@PathVariable UUID gameID, @PathVariable UUID playerID){
         return playerService.getPlayer(gameID,playerID);
     }
-    @GetMapping(path = "/{gameID}/{playerID}/availableMoves")
+    @GetMapping(path = "/{playerID}/availableMoves")
     public Mono<AvailableMovesResponse> getAvailableMoves(@PathVariable UUID gameID, @PathVariable UUID playerID){
         return playerService.getAvailableMoves(gameID,playerID);
     }
-    @PostMapping(path = "/{gameID}/{playerID}/putCard")
+    @PostMapping(path = "/{playerID}/putCard")
     public Mono<List<List<PlayerCard>>> putCard(@PathVariable UUID gameID,
                                                 @PathVariable UUID playerID,
                                                 @RequestBody PutCardRequestBody body){
