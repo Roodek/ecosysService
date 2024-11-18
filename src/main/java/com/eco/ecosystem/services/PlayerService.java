@@ -2,8 +2,8 @@ package com.eco.ecosystem.services;
 
 import com.eco.ecosystem.controllers.requestBodies.PlayerUpdateRequestBody;
 import com.eco.ecosystem.controllers.requestBodies.PutCardRequestBody;
+import com.eco.ecosystem.controllers.requestBodies.PutRabbitCardAndSwapTwoRequestBody;
 import com.eco.ecosystem.controllers.responseObjects.AvailableMovesResponse;
-import com.eco.ecosystem.dto.GameDto;
 import com.eco.ecosystem.entities.Game;
 import com.eco.ecosystem.entities.Player;
 import com.eco.ecosystem.entities.PlayerCard;
@@ -21,10 +21,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class PlayerService {
@@ -84,6 +81,42 @@ public class PlayerService {
                                 .then(Mono.just(board))));
     }
 
+    public Mono<List<List<PlayerCard>>> rabbitSwapCard(UUID gameID, UUID playerID, PutRabbitCardAndSwapTwoRequestBody body){
+        return getPlayer(gameID, playerID)
+                .flatMap(player -> putRabbitCardOnBoard(gameID, playerID, body, player)
+                        .flatMap(board -> gameService.updateGameStateIfTurnEnded(gameID).ignoreElement()
+                                .then(Mono.just(board))
+                        )
+                );
+    }
+
+    private Mono<List<List<PlayerCard>>> putRabbitCardOnBoard(UUID gameID, UUID playerID, PutRabbitCardAndSwapTwoRequestBody body, Player player){
+        var cardSlots = getCardsSlots(player.getBoard());
+        if (
+                !isMoveAvailable(player, new PlayerCard(Card.from(Card.CardType.RABBIT)), body.getRabbitSlot()) ||
+                !cardSlots.contains(body.getSlotToSwap1()) ||
+                !cardSlots.contains(body.getSlotToSwap2())
+        ) {
+            return Mono.error(new InvalidMoveException("Move invalid"));
+        }
+        try {
+            var updatedBoard = new Board(player.getBoard())
+                    .putCard(
+                            Card.from(Card.CardType.RABBIT),
+                            body.getRabbitSlot().coordX(),
+                            body.getRabbitSlot().coordY())
+                    .rabbitSwap(body.getSlotToSwap1(),body.getSlotToSwap2())
+                    .toResponseBoard();
+            Update update = new Update()
+                    .set(Game.PLAYERS_FIELD + ".$." + Player.BOARD_FIELD, updatedBoard)
+                    .set(Game.PLAYERS_FIELD + ".$." + Player.CARDS_IN_HAND_FIELD, removeCardFromPlayersHand(player, Card.CardType.RABBIT));
+
+            return reactiveMongoTemplate.updateFirst(getPlayerQuery(gameID, playerID), update, Game.class).then(Mono.just(updatedBoard));
+        } catch (InvalidMoveException e) {
+            return Mono.error(e);
+        }
+    }
+
     private Mono<List<List<PlayerCard>>> putCardOnPlayersBoard(UUID gameID, UUID playerID, PutCardRequestBody body, Player player) {
         if (!isMoveAvailable(player, new PlayerCard(body.getCardType().toString()), body.getSlot())) {
             return Mono.error(new InvalidMoveException("Move invalid"));
@@ -104,7 +137,17 @@ public class PlayerService {
             return Mono.error(e);
         }
     }
-
+    private Set<Slot> getCardsSlots(List<List<PlayerCard>> board){
+        Set<Slot> slots = new HashSet<>();
+        for(int i=0;i<board.size();i++){
+            for(int j=0;j<board.get(i).size();j++){
+                if(board.get(i).get(j)!=null){
+                    slots.add(new Slot(i,j));
+                }
+            }
+        }
+        return slots;
+    }
     private Boolean isMoveAvailable(Player player, PlayerCard card, Slot slot) {
         return new BoardAvailableMoveCalculator(new Board(player.getBoard()))
                 .getAvailableMoves().stream().toList().contains(slot)

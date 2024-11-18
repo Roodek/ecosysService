@@ -1,0 +1,488 @@
+{
+  "_id": {
+    "$binary": {
+      "base64": "B3hdUxwoQgG2pcDHICRrVA==",
+      "subType": "04"
+    }
+  },
+  "players": [
+    {
+      "_id": {
+        "$binary": {
+          "base64": "U3RJCnZzQOG2JjlCqBiEeA==",
+          "subType": "04"
+        }
+      },
+      "name": "Emi",
+      "cardsInHand": [
+        {
+          "cardType": "WOLF"
+        },
+        {
+          "cardType": "BEE"
+        },
+        {
+          "cardType": "EAGLE"
+        },
+        {
+          "cardType": "FISH"
+        },
+        {
+          "cardType": "RABBIT"
+        },
+        {
+          "cardType": "WOLF"
+        },
+        {
+          "cardType": "MEADOW"
+        },
+        {
+          "cardType": "FISH"
+        },
+        {
+          "cardType": "DRAGONFLY"
+        },
+        {
+          "cardType": "FISH"
+        }
+      ],
+      "board": [
+        [
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          {
+            "cardType": "FOX"
+          },
+          null
+        ],
+        [
+          null,
+          null,
+          null
+        ]
+      ],
+      "pointCount": 0
+    },
+    {
+      "_id": {
+        "$binary": {
+          "base64": "/5ztQsJiTzuPpJt66/XksA==",
+          "subType": "04"
+        }
+      },
+      "name": "Rodek",
+      "cardsInHand": [
+        {
+          "cardType": "EAGLE"
+        },
+        {
+          "cardType": "MEADOW"
+        },
+        {
+          "cardType": "WOLF"
+        },
+        {
+          "cardType": "RIVER"
+        },
+        {
+          "cardType": "BEE"
+        },
+        {
+          "cardType": "MEADOW"
+        },
+        {
+          "cardType": "RIVER"
+        },
+        {
+          "cardType": "MEADOW"
+        },
+        {
+          "cardType": "RIVER"
+        },
+        {
+          "cardType": "MEADOW"
+        }
+      ],
+      "board": [
+        [
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          {
+            "cardType": "BEAR"
+          },
+          null
+        ],
+        [
+          null,
+          null,
+          null
+        ]
+      ],
+      "pointCount": 0
+    },
+    {
+      "_id": {
+        "$binary": {
+          "base64": "bQtsPkl2RZGun9q1TbFveg==",
+          "subType": "04"
+        }
+      },
+      "name": "3rd player",
+      "cardsInHand": [
+        {
+          "cardType": "RIVER"
+        },
+        {
+          "cardType": "BEAR"
+        },
+        {
+          "cardType": "WOLF"
+        },
+        {
+          "cardType": "BEAR"
+        },
+        {
+          "cardType": "WOLF"
+        },
+        {
+          "cardType": "BEAR"
+        },
+        {
+          "cardType": "EAGLE"
+        },
+        {
+          "cardType": "MEADOW"
+        },
+        {
+          "cardType": "WOLF"
+        },
+        {
+          "cardType": "MEADOW"
+        }
+      ],
+      "board": [
+        [
+          null,
+          null,
+          null
+        ],
+        [
+          null,
+          {
+            "cardType": "MEADOW"
+          },
+          null
+        ],
+        [
+          null,
+          null,
+          null
+        ]
+      ],
+      "pointCount": 0
+    }
+  ],
+  "cardStack": [
+    {
+      "cardType": "FOX"
+    },
+    {
+      "cardType": "BEE"
+    },
+    {
+      "cardType": "EAGLE"
+    },
+    {
+      "cardType": "RIVER"
+    },
+    {
+      "cardType": "MEADOW"
+    },
+    {
+      "cardType": "FOX"
+    },
+    {
+      "cardType": "MEADOW"
+    },
+    {
+      "cardType": "FOX"
+    },
+    {
+      "cardType": "BEE"
+    },
+    {
+      "cardType": "ELK"
+    },
+    {
+      "cardType": "BEAR"
+    },
+    {
+      "cardType": "WOLF"
+    },
+    {
+      "cardType": "RIVER"
+    },
+    {
+      "cardType": "BEAR"
+    },
+    {
+      "cardType": "ELK"
+    },
+    {
+      "cardType": "FISH"
+    },
+    {
+      "cardType": "ELK"
+    },
+    {
+      "cardType": "FISH"
+    },
+    {
+      "cardType": "WOLF"
+    },
+    {
+      "cardType": "BEAR"
+    },
+    {
+      "cardType": "RIVER"
+    },
+    {
+      "cardType": "ELK"
+    },
+    {
+      "cardType": "FOX"
+    },
+    {
+      "cardType": "BEAR"
+    },
+    {
+      "cardType": "RIVER"
+    },
+    {
+      "cardType": "BEE"
+    },
+    {
+      "cardType": "FOX"
+    },
+    {
+      "cardType": "RIVER"
+    },
+    {
+      "cardType": "MEADOW"
+    },
+    {
+      "cardType": "DRAGONFLY"
+    },
+    {
+      "cardType": "FOX"
+    },
+    {
+      "cardType": "ELK"
+    },
+    {
+      "cardType": "EAGLE"
+    },
+    {
+      "cardType": "RIVER"
+    },
+    {
+      "cardType": "EAGLE"
+    },
+    {
+      "cardType": "MEADOW"
+    },
+    {
+      "cardType": "RIVER"
+    },
+    {
+      "cardType": "MEADOW"
+    },
+    {
+      "cardType": "MEADOW"
+    },
+    {
+      "cardType": "EAGLE"
+    },
+    {
+      "cardType": "DRAGONFLY"
+    },
+    {
+      "cardType": "WOLF"
+    },
+    {
+      "cardType": "RIVER"
+    },
+    {
+      "cardType": "RIVER"
+    },
+    {
+      "cardType": "DRAGONFLY"
+    },
+    {
+      "cardType": "ELK"
+    },
+    {
+      "cardType": "WOLF"
+    },
+    {
+      "cardType": "RABBIT"
+    },
+    {
+      "cardType": "FISH"
+    },
+    {
+      "cardType": "BEAR"
+    },
+    {
+      "cardType": "RABBIT"
+    },
+    {
+      "cardType": "BEAR"
+    },
+    {
+      "cardType": "RABBIT"
+    },
+    {
+      "cardType": "ELK"
+    },
+    {
+      "cardType": "MEADOW"
+    },
+    {
+      "cardType": "RIVER"
+    },
+    {
+      "cardType": "ELK"
+    },
+    {
+      "cardType": "RABBIT"
+    },
+    {
+      "cardType": "RABBIT"
+    },
+    {
+      "cardType": "DRAGONFLY"
+    },
+    {
+      "cardType": "BEAR"
+    },
+    {
+      "cardType": "WOLF"
+    },
+    {
+      "cardType": "FISH"
+    },
+    {
+      "cardType": "RIVER"
+    },
+    {
+      "cardType": "RIVER"
+    },
+    {
+      "cardType": "EAGLE"
+    },
+    {
+      "cardType": "ELK"
+    },
+    {
+      "cardType": "MEADOW"
+    },
+    {
+      "cardType": "DRAGONFLY"
+    },
+    {
+      "cardType": "DRAGONFLY"
+    },
+    {
+      "cardType": "FOX"
+    },
+    {
+      "cardType": "MEADOW"
+    },
+    {
+      "cardType": "ELK"
+    },
+    {
+      "cardType": "BEE"
+    },
+    {
+      "cardType": "RIVER"
+    },
+    {
+      "cardType": "BEAR"
+    },
+    {
+      "cardType": "RIVER"
+    },
+    {
+      "cardType": "ELK"
+    },
+    {
+      "cardType": "MEADOW"
+    },
+    {
+      "cardType": "WOLF"
+    },
+    {
+      "cardType": "RABBIT"
+    },
+    {
+      "cardType": "RABBIT"
+    },
+    {
+      "cardType": "FOX"
+    },
+    {
+      "cardType": "BEE"
+    },
+    {
+      "cardType": "FOX"
+    },
+    {
+      "cardType": "ELK"
+    },
+    {
+      "cardType": "FISH"
+    },
+    {
+      "cardType": "MEADOW"
+    },
+    {
+      "cardType": "FOX"
+    },
+    {
+      "cardType": "FISH"
+    },
+    {
+      "cardType": "FOX"
+    },
+    {
+      "cardType": "FISH"
+    },
+    {
+      "cardType": "BEE"
+    },
+    {
+      "cardType": "MEADOW"
+    },
+    {
+      "cardType": "RIVER"
+    },
+    {
+      "cardType": "DRAGONFLY"
+    },
+    {
+      "cardType": "RIVER"
+    }
+  ],
+  "turn": 2,
+  "_class": "com.eco.ecosystem.entities.Game"
+}

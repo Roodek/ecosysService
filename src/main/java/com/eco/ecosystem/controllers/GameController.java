@@ -1,6 +1,7 @@
 package com.eco.ecosystem.controllers;
 
 import com.eco.ecosystem.controllers.requestBodies.PlayerNameBody;
+import com.eco.ecosystem.controllers.responseObjects.GameResponse;
 import com.eco.ecosystem.dto.GameDto;
 import com.eco.ecosystem.entities.Message;
 import com.eco.ecosystem.services.GameService;
@@ -11,6 +12,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import utils.AppUtils;
 
 import java.util.UUID;
 
@@ -74,8 +76,8 @@ public class GameController {
         return gameService.getGame(id);
     }
     @GetMapping("/{gameID}/{playerID}")
-    public Mono<GameDto> getGameForSpecificPlayer(@PathVariable UUID gameID, @PathVariable UUID playerID) {
-        return gameService.getGameForSpecificPlayer(gameID,playerID);
+    public Mono<GameResponse> getGameForSpecificPlayer(@PathVariable UUID gameID, @PathVariable UUID playerID) {
+        return gameService.getGameForSpecificPlayer(gameID,playerID).map(AppUtils::gameDtoToResponse);
     }
 
     @DeleteMapping("/delete/{id}")

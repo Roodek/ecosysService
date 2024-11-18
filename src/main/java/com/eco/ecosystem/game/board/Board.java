@@ -133,10 +133,11 @@ public class Board {
         return this;
     }
 
-    public void rabbitSwap(Slot card1, Slot card2) {
+    public Board rabbitSwap(Slot card1, Slot card2) {
         Card cardAtFirstSlot = getCardAtSlot(card1);
         cardBoard.get(card1.coordX()).set(card1.coordY(), getCardAtSlot(card2));
         cardBoard.get(card2.coordX()).set(card2.coordY(), cardAtFirstSlot);
+        return this;
     }
 
     private boolean isBoardCompleted() {

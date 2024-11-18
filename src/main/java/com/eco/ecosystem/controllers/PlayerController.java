@@ -3,6 +3,7 @@ package com.eco.ecosystem.controllers;
 
 import com.eco.ecosystem.controllers.requestBodies.PlayerUpdateRequestBody;
 import com.eco.ecosystem.controllers.requestBodies.PutCardRequestBody;
+import com.eco.ecosystem.controllers.requestBodies.PutRabbitCardAndSwapTwoRequestBody;
 import com.eco.ecosystem.controllers.responseObjects.AvailableMovesResponse;
 import com.eco.ecosystem.entities.Player;
 import com.eco.ecosystem.entities.PlayerCard;
@@ -26,7 +27,6 @@ public class PlayerController {
     public Mono<UpdateResult> updatePlayer(@PathVariable UUID gameID,
                                            @PathVariable UUID playerID,
                                            @RequestBody PlayerUpdateRequestBody body){
-
         return playerService.updatePlayersHand(gameID,playerID,body);
     }
     @GetMapping(path = "/{playerID}")
@@ -42,6 +42,13 @@ public class PlayerController {
                                                 @PathVariable UUID playerID,
                                                 @RequestBody PutCardRequestBody body){
         return playerService.putCard(gameID,playerID,body);
+    }
+
+    @PostMapping(path = "/{playerID}/swapMove")
+    public Mono<List<List<PlayerCard>>> swapMove(@PathVariable UUID gameID,
+                                                 @PathVariable UUID playerID,
+                                                 @RequestBody PutRabbitCardAndSwapTwoRequestBody body){
+        return playerService.rabbitSwapCard(gameID,playerID,body);
     }
 
 

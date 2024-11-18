@@ -50,15 +50,6 @@ public class GameService {
                 .map(AppUtils::gameEntityToDto);
     }
 
-    public void swapPlayerHands(UUID gameID) {
-        gameRepository.findById(gameID)
-                .map(AppUtils::gameEntityToDto)
-                .map(GameDto::swapPlayersHands)
-                .map(AppUtils::gameDtoToEntity)
-                .flatMap(gameRepository::save)
-                .ignoreElement();
-    }
-
     public Mono<GameDto> updateGame(GameDto gameDto, UUID gameID) {
         Query query = new Query(
                 Criteria.where(Game.ID_FIELD).is(gameID));
