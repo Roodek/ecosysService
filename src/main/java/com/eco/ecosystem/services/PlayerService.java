@@ -4,6 +4,7 @@ import com.eco.ecosystem.controllers.requestBodies.PlayerUpdateRequestBody;
 import com.eco.ecosystem.controllers.requestBodies.PutCardRequestBody;
 import com.eco.ecosystem.controllers.requestBodies.PutRabbitCardAndSwapTwoRequestBody;
 import com.eco.ecosystem.controllers.responseObjects.AvailableMovesResponse;
+import com.eco.ecosystem.dto.GameDto;
 import com.eco.ecosystem.entities.Game;
 import com.eco.ecosystem.entities.Player;
 import com.eco.ecosystem.entities.PlayerCard;
@@ -74,18 +75,18 @@ public class PlayerService {
                 ));
     }
 
-    public Mono<List<List<PlayerCard>>> putCard(UUID gameID, UUID playerID, PutCardRequestBody body) {
+    public Mono<GameDto> putCard(UUID gameID, UUID playerID, PutCardRequestBody body) {
         return getPlayer(gameID, playerID)
                 .flatMap(player -> putCardOnPlayersBoard(gameID, playerID, body, player)
                         .flatMap(board -> gameService.updateGameStateIfTurnEnded(gameID).ignoreElement()
-                                .then(Mono.just(board))));
+                                .then(gameService.getGameForSpecificPlayer(gameID,playerID))));
     }
 
-    public Mono<List<List<PlayerCard>>> rabbitSwapCard(UUID gameID, UUID playerID, PutRabbitCardAndSwapTwoRequestBody body){
+    public Mono<GameDto> rabbitSwapCard(UUID gameID, UUID playerID, PutRabbitCardAndSwapTwoRequestBody body){
         return getPlayer(gameID, playerID)
                 .flatMap(player -> putRabbitCardOnBoard(gameID, playerID, body, player)
                         .flatMap(board -> gameService.updateGameStateIfTurnEnded(gameID).ignoreElement()
-                                .then(Mono.just(board))
+                                .then(gameService.getGameForSpecificPlayer(gameID,playerID))
                         )
                 );
     }
