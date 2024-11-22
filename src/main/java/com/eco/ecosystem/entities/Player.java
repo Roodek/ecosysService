@@ -18,6 +18,7 @@ public class Player {
     public static final String ID_FIELD ="_id";
     public static final String CARDS_IN_HAND_FIELD ="cardsInHand";
     public static final String BOARD_FIELD ="board";
+    public static final String SELECTED_MOVE_FIELD ="selectedMove";
     public static final String POINT_COUNT_FIELD ="pointCount";
     @JsonProperty("_id")
     private UUID id;
@@ -25,6 +26,8 @@ public class Player {
     private String name;
     @JsonProperty("cardsInHand")
     private List<PlayerCard> cardsInHand;
+    @JsonProperty("selectedMove")
+    private SelectedMove selectedMove;
     @JsonProperty("board")
     private List<List<PlayerCard>> board;
     @JsonProperty("pointCount")

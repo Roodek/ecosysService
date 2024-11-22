@@ -54,7 +54,7 @@ public class PlayerServiceTest extends ServiceTest{
         board.add(new ArrayList<>(Arrays.asList(null, null,                                         new PlayerCard(Card.from(Card.CardType.FISH)), null)));
         board.add(new ArrayList<>(Arrays.asList(null, null,                                         null,                                          null)));
         player = new Player(playerID, "name",
-                hand,
+                hand,null,
                 board,
         0);
 

@@ -18,10 +18,10 @@ public class GameDtoTest {
 
         var game = new GameDto(UUID.randomUUID(),
                 List.of(
-                        new Player(UUID.randomUUID(),"player1",List.of(),List.of(List.of()),0),
-                        new Player(UUID.randomUUID(),"player2",List.of(),List.of(List.of()),0),
-                        new Player(UUID.randomUUID(),"player3",List.of(),List.of(List.of()),0),
-                        new Player(UUID.randomUUID(),"player4",List.of(),List.of(List.of()),0)
+                        new Player(UUID.randomUUID(),"player1",List.of(),null,List.of(List.of()),0),
+                        new Player(UUID.randomUUID(),"player2",List.of(),null,List.of(List.of()),0),
+                        new Player(UUID.randomUUID(),"player3",List.of(),null,List.of(List.of()),0),
+                        new Player(UUID.randomUUID(),"player4",List.of(),null,List.of(List.of()),0)
                 ),
                 CardStack.initCardStack().stream().map(PlayerCard::new).toList(),
                 0);

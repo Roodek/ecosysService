@@ -4,8 +4,12 @@ import com.eco.ecosystem.dto.GameDto;
 import com.eco.ecosystem.entities.Game;
 import com.eco.ecosystem.entities.Message;
 import com.eco.ecosystem.entities.Player;
+import com.eco.ecosystem.entities.PlayerCard;
+import com.eco.ecosystem.game.board.Board;
+import com.eco.ecosystem.game.cards.Card;
 import com.eco.ecosystem.game.exceptions.FullPlayerCountException;
 import com.eco.ecosystem.game.exceptions.GameNotFoundException;
+import com.eco.ecosystem.game.exceptions.InvalidMoveException;
 import com.eco.ecosystem.repository.GameRepository;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +24,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import utils.AppUtils;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -73,7 +79,7 @@ public class GameService {
 
     public Mono<UUID> joinGame(UUID gameID, String playerName) {
         var newPlayeruuid = UUID.randomUUID();
-        var newPlayer = new Player(newPlayeruuid, playerName, List.of(), List.of(List.of()), 0);
+        var newPlayer = new Player(newPlayeruuid, playerName, List.of(),null, List.of(List.of()), 0);
         Query query = new Query(
                 Criteria.where(Game.ID_FIELD).is(gameID));
         Update update = new Update()
@@ -135,27 +141,70 @@ public class GameService {
 
     public Mono<GameDto> updateGameStateIfTurnEnded(UUID gameID) {
         return getGame(gameID)
-                .flatMap(gameDto -> arePlayerHandsEqualInSize(gameDto.getPlayers()) ?
+                .flatMap(gameDto -> arePlayerCommitted(gameDto.getPlayers()) ?
                         startNewTurn(gameDto)
                                 .map(updatedGame->{
-                                    simpMessagingTemplate.convertAndSend("/topic/games/" + gameID.toString(), new Message(gameID.toString(), "TURN_ENDED"));
+                                    simpMessagingTemplate.convertAndSend("/topic/games/" + gameID.toString(),
+                                            new Message(gameID.toString(), "TURN_ENDED"));
                                     return updatedGame;
                                 }) :
                         Mono.just(gameDto));
     }
 
-    private Mono<GameDto> startNewTurn(GameDto gameDto){
+    private Mono<GameDto> startNewTurn(GameDto gameDto) {
         var gameCopy = new GameDto(gameDto);
-        if(gameCopy.getTurn()==HALF_GAME_TURN){
-            gameCopy.startSecondPhase();
+        gameCopy.setPlayers(gameCopy.getPlayers().stream().map(player -> {
+            try {
+                applySelectedMove(player);
+                player.setSelectedMove(null);
+            }catch (InvalidMoveException e){
+                player.setSelectedMove(null);
+            }
+            return player;
+        }).toList());
+        if(gameCopy.allPlayersAppliedMove()){
+            if(gameCopy.getTurn()==HALF_GAME_TURN){
+                gameCopy.startSecondPhase();
+            }
+            gameCopy.setTurn(gameCopy.getTurn()+1);
+            gameCopy.swapPlayersHands();
+            return updateGame(gameCopy,gameCopy.getId());
+        }else{
+            return Mono.just(gameCopy);
         }
-        gameCopy.setTurn(gameCopy.getTurn()+1);
-        gameCopy.swapPlayersHands();
-        return updateGame(gameCopy,gameCopy.getId());
     }
 
-    private boolean arePlayerHandsEqualInSize(List<Player> players) {
-        var expectedSize = players.get(0).getCardsInHand().size();
-        return players.stream().allMatch(player -> player.getCardsInHand().size() == expectedSize);
+    private void applySelectedMove(Player player) throws InvalidMoveException {
+        var updatedBoard = player.getSelectedMove().getSelectedCard()== Card.CardType.RABBIT?
+                new Board(player.getBoard())
+                        .putCard(
+                                Card.from(player.getSelectedMove().getSelectedCard()),
+                                player.getSelectedMove().getSelectedSlot().coordX(),
+                                player.getSelectedMove().getSelectedSlot().coordY()
+                        ).rabbitSwap(player.getSelectedMove().getSlotToSwap1(), player.getSelectedMove().getSlotToSwap2())
+                :
+                new Board(player.getBoard())
+                        .putCard(
+                                Card.from(player.getSelectedMove().getSelectedCard()),
+                                player.getSelectedMove().getSelectedSlot().coordX(),
+                                player.getSelectedMove().getSelectedSlot().coordY()
+                        );
+        player.setCardsInHand(removeCardFromPlayersHand(player));
+        player.setBoard(updatedBoard.toResponseBoard());
+    }
+    private List<PlayerCard> removeCardFromPlayersHand(Player player) {
+        var result = new ArrayList<>(player.getCardsInHand());
+        Iterator<PlayerCard> itr = result.iterator();
+        while (itr.hasNext()) {
+            if (itr.next().getCardType().equals(player.getSelectedMove().getSelectedCard().toString())) {
+                itr.remove();
+                break;
+            }
+        }
+        return result;
+    }
+
+    private boolean arePlayerCommitted(List<Player> players) {
+        return players.stream().allMatch(player -> player.getSelectedMove()!=null);
     }
 }

@@ -35,7 +35,7 @@ public class GameScenarioTest extends ScenarioTest {
                         new Player(
                                 UUID.randomUUID(),
                                 "player1",
-                                List.of(new PlayerCard("ELK"), new PlayerCard("RIVER")),
+                                List.of(new PlayerCard("ELK"), new PlayerCard("RIVER")),null,
                                 board,0
                         )),
                 List.of(new PlayerCard("BEE"), new PlayerCard("ELK")),3);

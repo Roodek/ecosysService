@@ -3,7 +3,9 @@ package service;
 import com.eco.ecosystem.entities.Game;
 import com.eco.ecosystem.entities.Player;
 import com.eco.ecosystem.entities.PlayerCard;
+import com.eco.ecosystem.entities.SelectedMove;
 import com.eco.ecosystem.game.CardStack;
+import com.eco.ecosystem.game.board.Slot;
 import com.eco.ecosystem.game.cards.Card;
 import com.eco.ecosystem.services.GameService;
 import org.junit.jupiter.api.Test;
@@ -22,7 +24,8 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 
@@ -75,14 +78,17 @@ public class GameServiceTest extends ServiceTest {
 
         var player1 = new Player(playerID, "player1",
                 hand1,
+                null,
                 board1,
                 0);
         var player2 = new Player(playerID2, "player2",
                 hand2,
+                null,
                 board2,
                 0);
         var player3 = new Player(playerID3, "player3",
                 hand3,
+                null,
                 board3,
                 0);
         var game = new Game(gameID, List.of(player1,player2,player3), List.of(), 4);
@@ -134,15 +140,15 @@ public class GameServiceTest extends ServiceTest {
                 new ArrayList<>(Arrays.asList(null, null, null, null)));
 
         var player1 = new Player(playerID, "player1",
-                hand1,
+                hand1,null,
                 board1,
                 0);
         var player2 = new Player(playerID2, "player2",
-                hand2,
+                hand2,null,
                 board2,
                 0);
         var player3 = new Player(playerID3, "player3",
-                hand3,
+                hand3,null,
                 board3,
                 0);
         var game = new Game(gameID, List.of(player1,player2,player3), List.of(), 4);
@@ -190,67 +196,70 @@ public class GameServiceTest extends ServiceTest {
                 new ArrayList<>(Arrays.asList(null, null, null, null)));
 
         var player1 = new Player(playerID, "player1",
-                hand1,
+                hand1,new SelectedMove(Card.CardType.ELK,new Slot(0,1),null,null),
                 board1,
                 0);
         var player2 = new Player(playerID2, "player2",
-                hand2,
+                hand2,new SelectedMove(Card.CardType.FOX,new Slot(0,1),null,null),
                 board2,
                 0);
         var player3 = new Player(playerID3, "player3",
-                hand3,
+                hand3,new SelectedMove(Card.CardType.BEE,new Slot(0,1),null,null),
                 board3,
                 0);
-        var game = new Game(gameID, List.of(player1,player2,player3), List.of(), 3);
+        var game = new Game(gameID, List.of(player1,player2,player3), List.of(), 4);
 
 
         when(reactiveMongoTemplate.findOne(any(), eq(Game.class))).thenReturn(Mono.just(game));
         when(reactiveMongoTemplate.findAndReplace(any(),any(),any(),eq(Game.COLLECTION_NAME))).thenAnswer(invocationOnMock -> Mono.just(invocationOnMock.getArgument(1)));
         var res = gameService.updateGameStateIfTurnEnded(gameID).block();
-        assertEquals(4,res.getTurn());
+        assertEquals(5,res.getTurn());
         assertEquals(hand2.get(0),res.getPlayers().get(0).getCardsInHand().get(0));
     }
     @Test
     void shouldProperlyUpdateGameStateWhenHalfGameTurnEnds(){
         var hand1 = List.of(
+                new PlayerCard(Card.from(Card.CardType.ELK)),
                 new PlayerCard(Card.from(Card.CardType.ELK))
         );
         var hand2 = List.of(
+                new PlayerCard(Card.from(Card.CardType.FOX)),
                 new PlayerCard(Card.from(Card.CardType.FOX))
         );
         var hand3 = List.of(
+                new PlayerCard(Card.from(Card.CardType.BEE)),
                 new PlayerCard(Card.from(Card.CardType.BEE))
         );
         List<List<PlayerCard>> board1 = List.of(
                 new ArrayList<>(Arrays.asList(new PlayerCard(Card.from(Card.CardType.ELK)), new PlayerCard(Card.from(Card.CardType.ELK)), new PlayerCard(Card.from(Card.CardType.ELK)), new PlayerCard(Card.from(Card.CardType.ELK)),new PlayerCard(Card.from(Card.CardType.ELK)))),
                 new ArrayList<>(Arrays.asList(new PlayerCard(Card.from(Card.CardType.ELK)), new PlayerCard(Card.from(Card.CardType.ELK)), null, null,null)),
                 new ArrayList<>(Arrays.asList(new PlayerCard(Card.from(Card.CardType.ELK)), new PlayerCard(Card.from(Card.CardType.ELK)), null, null,null)),
-                new ArrayList<>(Arrays.asList(new PlayerCard(Card.from(Card.CardType.ELK)), null, null, null,null)));
+                new ArrayList<>(Arrays.asList(null, null, null, null,null)));
         List<List<PlayerCard>> board2 = List.of(
                 new ArrayList<>(Arrays.asList(new PlayerCard(Card.from(Card.CardType.FOX)), new PlayerCard(Card.from(Card.CardType.FOX)), new PlayerCard(Card.from(Card.CardType.FOX)), new PlayerCard(Card.from(Card.CardType.FOX)),new PlayerCard(Card.from(Card.CardType.FOX)))),
                 new ArrayList<>(Arrays.asList(new PlayerCard(Card.from(Card.CardType.FOX)), new PlayerCard(Card.from(Card.CardType.FOX)), null, null,null)),
                 new ArrayList<>(Arrays.asList(new PlayerCard(Card.from(Card.CardType.FOX)), new PlayerCard(Card.from(Card.CardType.FOX)), null, null,null)),
-                new ArrayList<>(Arrays.asList(new PlayerCard(Card.from(Card.CardType.FOX)), null, null, null,null)));
+                new ArrayList<>(Arrays.asList(null, null, null, null,null)));
         List<List<PlayerCard>> board3 = List.of(
                 new ArrayList<>(Arrays.asList(new PlayerCard(Card.from(Card.CardType.BEE)), new PlayerCard(Card.from(Card.CardType.BEE)), new PlayerCard(Card.from(Card.CardType.BEE)), new PlayerCard(Card.from(Card.CardType.BEE)),new PlayerCard(Card.from(Card.CardType.BEE)))),
                 new ArrayList<>(Arrays.asList(new PlayerCard(Card.from(Card.CardType.BEE)), new PlayerCard(Card.from(Card.CardType.BEE)), null, null,null)),
                 new ArrayList<>(Arrays.asList(new PlayerCard(Card.from(Card.CardType.BEE)), new PlayerCard(Card.from(Card.CardType.BEE)), null, null,null)),
-                new ArrayList<>(Arrays.asList(new PlayerCard(Card.from(Card.CardType.BEE)), null, null, null,null)));
+                new ArrayList<>(Arrays.asList(null, null, null, null,null)));
 
         var player1 = new Player(playerID, "player1",
-                hand1,
+                hand1,new SelectedMove(Card.CardType.ELK,new Slot(3,0),null,null),
                 board1,
                 0);
         var player2 = new Player(playerID2, "player2",
-                hand2,
+                hand2,new SelectedMove(Card.CardType.FOX,new Slot(3,0),null,null),
                 board2,
                 0);
         var player3 = new Player(playerID3, "player3",
-                hand3,
+                hand3,new SelectedMove(Card.CardType.BEE,new Slot(3,0),null,null),
                 board3,
                 0);
-        var game = new Game(gameID, List.of(player1,player2,player3), CardStack.initCardStack().stream().map(PlayerCard::new).toList().subList(33,130), 10);
 
+        var game = new Game(gameID, List.of(player1,player2,player3), CardStack.initCardStack().stream().map(PlayerCard::new).toList().subList(33,130), 10);
 
         when(reactiveMongoTemplate.findOne(any(), eq(Game.class))).thenReturn(Mono.just(game));
         when(reactiveMongoTemplate.findAndReplace(any(),any(),any(),eq(Game.COLLECTION_NAME))).thenAnswer(invocationOnMock -> Mono.just(invocationOnMock.getArgument(1)));

@@ -11,6 +11,7 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -39,6 +40,11 @@ public class GameDto{
         this.turn = gameDto.turn;
     }
 
+    public boolean allPlayersAppliedMove(){
+        return players.stream().allMatch(player -> player.getBoard().stream()
+                .flatMap(List::stream)
+                .filter(Objects::nonNull).count()==turn);
+    }
     public GameDto swapPlayersHands() {
         if (turn < HALF_GAME_TURN) {
             List<PlayerCard> swapped = players.get(0).getCardsInHand();

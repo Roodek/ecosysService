@@ -35,9 +35,10 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-    testImplementation("org.testcontainers:testcontainers:1.20.0")
-    testImplementation("org.testcontainers:junit-jupiter:1.20.0")
-    testImplementation("org.testcontainers:mongodb:1.20.0")
+    testImplementation("org.testcontainers:testcontainers:1.20.4")
+//    testImplementation("org.springframework.boot:spring-boot-testcontainers:3.3.4")
+    testImplementation("org.testcontainers:junit-jupiter:1.20.4")
+    testImplementation("org.testcontainers:mongodb:1.20.4")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.18.0")
 

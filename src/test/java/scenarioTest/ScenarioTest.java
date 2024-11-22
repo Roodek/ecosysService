@@ -101,18 +101,19 @@ public class ScenarioTest {
                         UUID.fromString(PLAYER1_ID),
                         PLAYER1,
                         List.of(),
+                        null,
                         List.of(List.of()), 0
                 ),
                 new Player(
                         UUID.fromString(PLAYER2_ID),
                         PLAYER2,
-                        List.of(),
+                        List.of(),null,
                         List.of(List.of()), 0
                 ),
                 new Player(
                         UUID.fromString(PLAYER3_ID),
                         PLAYER3,
-                        List.of(),
+                        List.of(),null,
                         List.of(List.of()), 0
                 )
         ), CardStack.initCardStack().stream().map(PlayerCard::new).toList(),0);

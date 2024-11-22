@@ -1,6 +1,7 @@
 package com.eco.ecosystem.entities;
 
 import com.eco.ecosystem.game.cards.Card;
+import com.eco.ecosystem.game.exceptions.InvalidCardTypeException;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,5 +23,9 @@ public class PlayerCard {
     @Override
     public boolean equals(Object obj) {
         return obj.getClass()==this.getClass() && ((PlayerCard) obj).getCardType().equals(cardType);
+    }
+
+    public Card toCard() throws InvalidCardTypeException {
+        return Card.fromString(cardType);
     }
 }
