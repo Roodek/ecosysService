@@ -12,4 +12,8 @@ import lombok.Setter;
 public class PutCardRequestBody {
     Card.CardType cardType;
     Slot slot;
+
+    public void setCardType(Card.CardType cardType) {
+        this.cardType = cardType;
+    }
 }

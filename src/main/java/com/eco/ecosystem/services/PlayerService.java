@@ -1,5 +1,6 @@
 package com.eco.ecosystem.services;
 
+import com.eco.ecosystem.controllers.exceptions.IllegalMoveException;
 import com.eco.ecosystem.controllers.requestBodies.PlayerUpdateRequestBody;
 import com.eco.ecosystem.controllers.requestBodies.PutCardRequestBody;
 import com.eco.ecosystem.controllers.requestBodies.PutRabbitCardAndSwapTwoRequestBody;
@@ -79,13 +80,15 @@ public class PlayerService {
 
     public Mono<GameResponse> putCard(UUID gameID, UUID playerID, PutCardRequestBody body) {
         return getPlayer(gameID, playerID)
-                .flatMap(player -> putCardOnPlayersBoard(gameID, playerID, body, player)
+                .flatMap(player -> player.getSelectedMove() != null ? Mono.error(new IllegalMoveException("card already selected"))
+                        : putCardOnPlayersBoard(gameID, playerID, body, player)
                         .then(gameService.updateGameStateIfTurnEnded(gameID)).map(AppUtils::gameDtoToResponse));
     }
 
     public Mono<GameResponse> rabbitSwapCard(UUID gameID, UUID playerID, PutRabbitCardAndSwapTwoRequestBody body) {
         return getPlayer(gameID, playerID)
-                .flatMap(player -> putRabbitCardOnBoard(gameID, playerID, body, player)
+                .flatMap(player -> player.getSelectedMove() != null ? Mono.error(new IllegalMoveException("card already selected"))
+                        : putRabbitCardOnBoard(gameID, playerID, body, player)
                         .then(gameService.updateGameStateIfTurnEnded(gameID)).map(AppUtils::gameDtoToResponse)
                 );
     }
