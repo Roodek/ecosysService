@@ -73,4 +73,6 @@ public abstract class BasicCard implements Card{
     public String toString(){
         return this.type.toString();
     }
+
+
 }

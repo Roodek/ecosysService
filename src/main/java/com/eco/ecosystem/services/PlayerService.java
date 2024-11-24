@@ -94,7 +94,8 @@ public class PlayerService {
     }
 
     private Mono<Void> putRabbitCardOnBoard(UUID gameID, UUID playerID, PutRabbitCardAndSwapTwoRequestBody body, Player player) {
-        var cardSlots = getCardsSlots(player.getBoard());
+        var cardSlots = getBoardCardsSlots(player.getBoard());
+        cardSlots.add(body.getRabbitSlot());
         if (
                 !isMoveAvailable(player, new PlayerCard(Card.from(Card.CardType.RABBIT)), body.getRabbitSlot()) ||
                         !cardSlots.contains(body.getSlotToSwap1()) ||
@@ -123,7 +124,7 @@ public class PlayerService {
         return reactiveMongoTemplate.updateFirst(getPlayerQuery(gameID, playerID), update, Game.class).then();
     }
 
-    private Set<Slot> getCardsSlots(List<List<PlayerCard>> board) {
+    private Set<Slot> getBoardCardsSlots(List<List<PlayerCard>> board) {
         Set<Slot> slots = new HashSet<>();
         for (int i = 0; i < board.size(); i++) {
             for (int j = 0; j < board.get(i).size(); j++) {

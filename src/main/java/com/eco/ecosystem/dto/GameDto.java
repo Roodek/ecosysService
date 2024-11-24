@@ -1,8 +1,12 @@
 package com.eco.ecosystem.dto;
 
+import com.eco.ecosystem.entities.FinalGeneralCount;
+import com.eco.ecosystem.entities.Game;
 import com.eco.ecosystem.entities.Player;
 import com.eco.ecosystem.entities.PlayerCard;
 import com.eco.ecosystem.game.CardStack;
+import com.eco.ecosystem.game.GameTable;
+import com.eco.ecosystem.game.board.Board;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -85,5 +89,20 @@ public class GameDto{
         var cardsDealt = cardStack.subList(0,numberOfCards);
         cardStack = cardStack.subList(numberOfCards,cardStack.size());
         return cardsDealt;
+    }
+    public GameDto endGame(){
+        var playersWithCalculatedPoints = new GameTable(players.stream()
+                .map(Player::toGamePlayer).toList())
+                .endGame();
+        for(int i=0;i<players.size();i++){
+            players.get(i).setPointCount(playersWithCalculatedPoints.get(i).getSumOfPoints());
+            players.get(i).setFinalGeneralPointCount(
+                    new FinalGeneralCount(
+                            playersWithCalculatedPoints.get(i).getGeneralPointCount(),
+                            playersWithCalculatedPoints.get(i).getNumberOfGaps(),
+                            playersWithCalculatedPoints.get(i).getEcosystemGapPoints()
+                            ));
+        }
+        return this;
     }
 }

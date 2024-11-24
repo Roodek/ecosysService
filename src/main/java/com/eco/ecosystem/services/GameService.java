@@ -119,10 +119,6 @@ public class GameService {
                 .flatMap(game -> Mono.just(AppUtils.gameEntityToDto(game)));
     }
 
-    public Mono<GameDto> endGame(UUID gameID) {
-        return null;
-    }
-
     public Mono<GameDto> startGame(UUID gameID) {
         return validateGameExistsAndGet(gameID)
                 .flatMap(gameDto -> Mono.just(gameDto.startGame()))
@@ -165,9 +161,13 @@ public class GameService {
         if(gameCopy.allPlayersAppliedMove()){
             if(gameCopy.getTurn()==HALF_GAME_TURN){
                 gameCopy.startSecondPhase();
+            }else{
+                gameCopy.swapPlayersHands();
+            }
+            if(gameCopy.getTurn()==20){
+                updateGame(gameCopy.endGame(),gameCopy.getId());
             }
             gameCopy.setTurn(gameCopy.getTurn()+1);
-            gameCopy.swapPlayersHands();
             return updateGame(gameCopy,gameCopy.getId());
         }else{
             return Mono.just(gameCopy);
@@ -175,19 +175,20 @@ public class GameService {
     }
 
     private void applySelectedMove(Player player) throws InvalidMoveException {
-        var updatedBoard = player.getSelectedMove().getSelectedCard()== Card.CardType.RABBIT?
+        var updatedBoard = player.getSelectedMove().getSelectedCard() == Card.CardType.RABBIT
+                && player.getSelectedMove().getSlotToSwap1()!=null 
+                && player.getSelectedMove().getSlotToSwap2()!=null?
                 new Board(player.getBoard())
-                        .putCard(
-                                Card.from(player.getSelectedMove().getSelectedCard()),
-                                player.getSelectedMove().getSelectedSlot().coordX(),
-                                player.getSelectedMove().getSelectedSlot().coordY()
-                        ).rabbitSwap(player.getSelectedMove().getSlotToSwap1(), player.getSelectedMove().getSlotToSwap2())
+                        .putRabbitCard(
+                                player.getSelectedMove().getSelectedSlot(),
+                                player.getSelectedMove().getSlotToSwap1(),
+                                player.getSelectedMove().getSlotToSwap2()
+                        )
                 :
                 new Board(player.getBoard())
                         .putCard(
                                 Card.from(player.getSelectedMove().getSelectedCard()),
-                                player.getSelectedMove().getSelectedSlot().coordX(),
-                                player.getSelectedMove().getSelectedSlot().coordY()
+                                player.getSelectedMove().getSelectedSlot()
                         );
         player.setCardsInHand(removeCardFromPlayersHand(player));
         player.setBoard(updatedBoard.toResponseBoard());

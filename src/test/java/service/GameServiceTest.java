@@ -267,9 +267,9 @@ public class GameServiceTest extends ServiceTest {
         assertEquals(11,res.getTurn());
         assertTrue(res.getPlayers().stream().allMatch(it->it.getCardsInHand().size()==11));
         assertEquals(130-33-30, res.getCardStack().size());
-        assertEquals(hand3.get(0),res.getPlayers().get(0).getCardsInHand().get(0));
-        assertEquals(hand1.get(0),res.getPlayers().get(1).getCardsInHand().get(0));
-        assertEquals(hand2.get(0),res.getPlayers().get(2).getCardsInHand().get(0));
+        assertEquals(hand1.get(0),res.getPlayers().get(0).getCardsInHand().get(0));
+        assertEquals(hand2.get(0),res.getPlayers().get(1).getCardsInHand().get(0));
+        assertEquals(hand3.get(0),res.getPlayers().get(2).getCardsInHand().get(0));
 
     }
 }

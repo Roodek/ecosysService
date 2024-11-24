@@ -1,5 +1,7 @@
 package com.eco.ecosystem.entities;
 
+import com.eco.ecosystem.game.GamePlayer;
+import com.eco.ecosystem.game.board.Board;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,10 +34,42 @@ public class Player {
     private List<List<PlayerCard>> board;
     @JsonProperty("pointCount")
     private int pointCount;
+    @JsonProperty("finalGeneralPointCount")
+    private FinalGeneralCount finalGeneralPointCount;
 
+
+    public GamePlayer toGamePlayer(){
+        return new GamePlayer(name,new Board(board));
+    }
+
+    public Player(UUID id,
+                  String name,
+                  List<PlayerCard> cardsInHand,
+                  SelectedMove selectedMove,
+                  List<List<PlayerCard>> board,
+                  int pointCount) {
+        this.id = id;
+        this.name = name;
+        this.cardsInHand = cardsInHand;
+        this.selectedMove = selectedMove;
+        this.board = board;
+        this.pointCount = pointCount;
+    }
 
     @Override
     public String toString() {
-        return this.name+" - "+this.pointCount + " - "+this.cardsInHand;
+        return "Player{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", cardsInHand=" + cardsInHand +
+                ", selectedMove=" + selectedMove +
+                ", board=" + board +
+                ", pointCount=" + pointCount +
+                ", finalGeneralPointCount=" + finalGeneralPointCount +
+                '}';
+    }
+
+    public void printBoard(){
+        new Board(board).printBoard();
     }
 }

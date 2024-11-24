@@ -91,10 +91,18 @@ public class Board {
     }
 
     public void putFirstCard(Card card) throws InvalidMoveException {
-        putCard(card, 0, 0);
+        putCard(card, new Slot(0,0));
     }
 
-    public Board putCard(Card card, int coordX, int coordY) throws IndexOutOfBoundsException, InvalidMoveException {
+    public Board putRabbitCard(Slot rabbitSlot,Slot slotToSwap1,Slot slotToSwap2) throws InvalidMoveException {
+        return slotToSwap1 !=null && slotToSwap2!=null ?
+                putCardAndPerformAction(Card.from(Card.CardType.RABBIT),rabbitSlot,slotToSwap1,slotToSwap2):
+                putCard(Card.from(Card.CardType.RABBIT),rabbitSlot);
+    }
+    public Board putCard(Card card, Slot slot) throws InvalidMoveException {
+        return putCardAndPerformAction(card,slot,null,null);
+    }
+    private Board putCardAndPerformAction(Card card, Slot slot,Slot slotToSwap1,Slot slotToSwap2) throws IndexOutOfBoundsException, InvalidMoveException {
         if (isBoardCompleted()) {
             throw new InvalidMoveException("Invalid move, board is already completed");
         }
@@ -104,27 +112,14 @@ public class Board {
             sizeVertical++;
             sizeHorizontal++;
         } else {
-            if (cardBoard.get(coordX).get(coordY) != null) {
+            if (cardBoard.get(slot.coordX()).get(slot.coordY()) != null) {
                 throw new InvalidMoveException("Invalid move, slot already taken");
             }
-            cardBoard.get(coordX).set(coordY, card);
-            if (coordX == 0 && sizeVertical < 5) {
-                addNewFirstRow();
-                sizeVertical++;
-                checkIfMaxVerticalAndCutBoardTo5x4();
-            } else if (coordX == sizeVertical + 1 && sizeVertical < 5) {
-                addNewLastRow();
-                sizeVertical++;
-                checkIfMaxVerticalAndCutBoardTo5x4();
-            } else if (coordY == 0 && sizeHorizontal < 5) {
-                addNewFirstColumn();
-                sizeHorizontal++;
-                checkIfMaxHorizontalAndCutBoardTo4x5();
-            } else if (coordY == sizeHorizontal + 1 && sizeHorizontal < 5) {
-                addNewLastColumn();
-                sizeHorizontal++;
-                checkIfMaxHorizontalAndCutBoardTo4x5();
+            cardBoard.get(slot.coordX()).set(slot.coordY(), card);
+            if(card.getType() == Card.CardType.RABBIT && slotToSwap1!=null && slotToSwap2!=null ){
+               rabbitSwap(slotToSwap1,slotToSwap2);
             }
+            handlePossibleBoardSizeChange(slot);
         }
         if (isBoardCompleted()) {
             assignNeighbours();
@@ -133,27 +128,50 @@ public class Board {
         return this;
     }
 
-    public Board rabbitSwap(Slot card1, Slot card2) {
+    private void handlePossibleBoardSizeChange(Slot slot) {
+        if (slot.coordX() == 0 && sizeVertical < 5) {
+            addNewFirstRow();
+            sizeVertical++;
+            checkIfMaxDimensionsAndCutBoardToAllowedDimension();
+        } else if (slot.coordX() == sizeVertical + 1 && sizeVertical < 5) {
+            addNewLastRow();
+            sizeVertical++;
+            checkIfMaxDimensionsAndCutBoardToAllowedDimension();
+        } else if (slot.coordY() == 0 && sizeHorizontal < 5) {
+            addNewFirstColumn();
+            sizeHorizontal++;
+            checkIfMaxDimensionsAndCutBoardToAllowedDimension();
+        } else if (slot.coordY() == sizeHorizontal + 1 && sizeHorizontal < 5) {
+            addNewLastColumn();
+            sizeHorizontal++;
+            checkIfMaxDimensionsAndCutBoardToAllowedDimension();
+        }
+    }
+
+    private void rabbitSwap(Slot card1, Slot card2) {
         Card cardAtFirstSlot = getCardAtSlot(card1);
         cardBoard.get(card1.coordX()).set(card1.coordY(), getCardAtSlot(card2));
         cardBoard.get(card2.coordX()).set(card2.coordY(), cardAtFirstSlot);
-        return this;
     }
 
     private boolean isBoardCompleted() {
         return cardBoard.stream()
                 .flatMap(Collection::stream).filter(Objects::nonNull).count() == 20;
     }
+    private void checkIfMaxDimensionsAndCutBoardToAllowedDimension() {
+        checkIfMaxHorizontalAndCutBoardTo4x5();
+        checkIfMaxVerticalAndCutBoardTo5x4();
+    }
 
     private void checkIfMaxVerticalAndCutBoardTo5x4() {
-        if (sizeVertical == maxVerticalSize) {
+        if (sizeVertical == maxVerticalSize && cardBoard.get(0).stream().allMatch(Objects::isNull)) {
             cardBoard = new ArrayList<>(cardBoard.subList(1, maxVerticalSize + 1));
             maxHorizontalSize = 4;
         }
     }
 
     private void checkIfMaxHorizontalAndCutBoardTo4x5() {
-        if (sizeHorizontal == maxHorizontalSize) {
+        if (sizeHorizontal == maxHorizontalSize && cardBoard.stream().map(row->row.get(0)).allMatch(Objects::isNull)) {
             cardBoard.replaceAll(cards -> new ArrayList<>(cards.subList(1, maxHorizontalSize + 1)));
             maxVerticalSize = 4;
         }

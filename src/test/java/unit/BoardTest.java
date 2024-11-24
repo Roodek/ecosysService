@@ -44,7 +44,7 @@ class BoardTest {
         var board1 = new Board(List.of(List.of()));
         assertEquals(0,board1.getSizeVertical());
         assertEquals(0,board1.getSizeHorizontal());
-        board1.putCard(Card.from(Card.CardType.FOX),0,0);
+        board1.putCard(Card.from(Card.CardType.FOX),new Slot(0,0));
         assertTrue(board1.getCardBoard().get(1).get(1).getType()== Card.CardType.FOX);
     }
 
@@ -106,7 +106,7 @@ class BoardTest {
         assertEquals(1,board.getSizeVertical());
 
         assertEquals(expectedBoard,board.getCardBoard());
-        board.putCard(river,0,1);
+        board.putCard(river,new Slot(0,1));
         assertEquals(1,board.getSizeHorizontal());
         assertEquals(2,board.getSizeVertical());
 
@@ -114,7 +114,7 @@ class BoardTest {
         expectedBoard.add(0, new ArrayList<>(Arrays.asList(null,null,null)));
         assertEquals(expectedBoard,board.getCardBoard());
 
-        board.putCard(bee,1,2);
+        board.putCard(bee,new Slot(1,2));
         assertEquals(2,board.getSizeHorizontal());
         assertEquals(2,board.getSizeVertical());
         expectedBoard.forEach(row->row.add(null));
@@ -122,7 +122,7 @@ class BoardTest {
 
         assertEquals(expectedBoard,board.getCardBoard());
 
-        board.putCard(elk,2,0);
+        board.putCard(elk,new Slot(2,0));
         assertEquals(3,board.getSizeHorizontal());
         assertEquals(2,board.getSizeVertical());
         expectedBoard.get(2).set(0,elk);
@@ -130,7 +130,7 @@ class BoardTest {
 
         assertEquals(expectedBoard,board.getCardBoard());
 
-        board.putCard(fox,3,2);
+        board.putCard(fox,new Slot(3,2));
         assertEquals(3,board.getSizeHorizontal());
         assertEquals(3,board.getSizeVertical());
         expectedBoard.get(3).set(2,fox);
@@ -153,10 +153,10 @@ class BoardTest {
 
 
         board.putFirstCard(wolf);
-        board.putCard(river,1,0);
-        board.putCard(bee,1,0);
-        board.putCard(elk,1,0);
-        board.putCard(fox,1,0);
+        board.putCard(river,new Slot(1,0));
+        board.putCard(bee,new Slot(1,0));
+        board.putCard(elk,new Slot(1,0));
+        board.putCard(fox,new Slot(1,0));
 
         var expectedBoard =new ArrayList<ArrayList<Card>>();
         expectedBoard.add(new ArrayList<>(Arrays.asList(null,null,null,null,null)));
@@ -167,9 +167,9 @@ class BoardTest {
         assertEquals(5, board.getSizeHorizontal());
 
         assertEquals(expectedBoard,board.getCardBoard());
-        board.putCard(meadow,0,4);
-        board.putCard(dragonfly,0,4);
-        board.putCard(fish,0,4);
+        board.putCard(meadow,new Slot(0,4));
+        board.putCard(dragonfly,new Slot(0,4));
+        board.putCard(fish,new Slot(0,4));
 
         var expectedBoard2 = new ArrayList<ArrayList<Card>>();
         expectedBoard2.add(new ArrayList<>(Arrays.asList(null,null,null,null,fish)));
@@ -194,10 +194,10 @@ class BoardTest {
         var fish= new FishCard();
 
         board.putFirstCard(wolf);
-        board.putCard(river,0,1);
-        board.putCard(bee,0,1);
-        board.putCard(elk,0,1);
-        board.putCard(fox,0,1);
+        board.putCard(river,new Slot(0,1));
+        board.putCard(bee,new Slot(0,1));
+        board.putCard(elk,new Slot(0,1));
+        board.putCard(fox,new Slot(0,1));
 
         var expectedBoard =new ArrayList<ArrayList<Card>>();
         expectedBoard.add(new ArrayList<>(Arrays.asList(null,fox,null)));
@@ -211,9 +211,9 @@ class BoardTest {
 
 
         assertEquals(expectedBoard,board.getCardBoard());
-        board.putCard(meadow,0,0);
-        board.putCard(dragonfly,0,0);
-        board.putCard(fish,0,0);
+        board.putCard(meadow,new Slot(0,0));
+        board.putCard(dragonfly,new Slot(0,0));
+        board.putCard(fish,new Slot(0,0));
 
         var expectedBoard2 = new ArrayList<ArrayList<Card>>();
         expectedBoard2.add(new ArrayList<>(Arrays.asList(fish,dragonfly,meadow,fox)));
@@ -224,8 +224,7 @@ class BoardTest {
 
         assertEquals(expectedBoard2,board.getCardBoard());
         Card rabbit = new RabbitCard();
-        board.putCard(rabbit,2,2);
-        board.rabbitSwap(new Slot(2,2),new Slot(2,3));
+        board.putRabbitCard(new Slot(2,2),new Slot(2,2),new Slot(2,3));
 
         var expectedBoard3 = new ArrayList<ArrayList<Card>>();
         expectedBoard3.add(new ArrayList<>(Arrays.asList(fish,dragonfly,meadow,fox)));
@@ -234,7 +233,7 @@ class BoardTest {
         expectedBoard3.add(new ArrayList<>(Arrays.asList(null,null,null,river)));
         expectedBoard3.add(new ArrayList<>(Arrays.asList(null,null,null,wolf)));
 
-        assertEquals(expectedBoard3,board.getCardBoard());
+        assertEquals(expectedBoard3.toString(),board.getCardBoard().toString());
 
     }
     @Test
@@ -251,18 +250,16 @@ class BoardTest {
         var rabbit = new RabbitCard();
 
         board.putFirstCard(wolf);
-        board.putCard(river,0,1);
-        board.putCard(bee,0,1);
-        board.putCard(elk,0,1);
-        board.putCard(fox,0,1);
-        board.putCard(meadow,0,0);
-        board.putCard(dragonfly,0,0);
-        board.putCard(fish,0,0);
+        board.putCard(river,new Slot(0,1));
+        board.putCard(bee,new Slot(0,1));
+        board.putCard(elk,new Slot(0,1));
+        board.putCard(fox,new Slot(0,1));
+        board.putCard(meadow,new Slot(0,0));
+        board.putCard(dragonfly,new Slot(0,0));
+        board.putCard(fish,new Slot(0,0));
 
-        board.putCard(rabbit,2,2);
+        board.putRabbitCard(new Slot(2,2),new Slot(2,2),new Slot(2,3));
         board.printBoard();
-
-        board.rabbitSwap(new Slot(2,2),new Slot(2,3));
 
         var expectedBoard3 = new ArrayList<ArrayList<Card>>();
         expectedBoard3.add(new ArrayList<>(Arrays.asList(fish,dragonfly,meadow,fox)));
@@ -271,7 +268,7 @@ class BoardTest {
         expectedBoard3.add(new ArrayList<>(Arrays.asList(null,null,null,river)));
         expectedBoard3.add(new ArrayList<>(Arrays.asList(null,null,null,wolf)));
 
-        assertEquals(expectedBoard3,board.getCardBoard());
+        assertEquals(expectedBoard3.toString(),board.getCardBoard().toString());
     }
 
     @Test
@@ -298,27 +295,27 @@ class BoardTest {
         var eagle1 = new EagleCard();
 
         board.putFirstCard(wolf1);
-        board.putCard(elk1,1,0);
-        board.putCard(fox1,1,0);
-        board.putCard(river1,1,4);
-        board.putCard(fox2,1,5);//board gets cut down to 5x3
-        assertThrows(InvalidMoveException.class, ()->board.putCard(fox2,1,0));
-        assertThrows(IndexOutOfBoundsException.class, ()->board.putCard(fox2,1,5));
-        board.putCard(meadow1,2,0);
-        board.putCard(meadow2,2,1);
-        board.putCard(river2,2,2);
-        board.putCard(river3,2,3);
-        board.putCard(river4,2,4);
-        board.putCard(meadow3,3,0);
-        board.putCard(bee1,3,1);
-        board.putCard(bear1,3,2);
-        board.putCard(fish1,3,3);
-        board.putCard(dragonfly1,3,4);
-        board.putCard(meadow4,4,0);//board gets cut down to 5x4
-        board.putCard(wolf2,3,1);
-        board.putCard(wolf3,3,2);
-        board.putCard(rabbit1,3,3);
-        board.putCard(eagle1,3,4);
+        board.putCard(elk1,new Slot(1,0));
+        board.putCard(fox1,new Slot(1,0));
+        board.putCard(river1,new Slot(1,4));
+        board.putCard(fox2,new Slot(1,5));//board gets cut down to 5x3
+        assertThrows(InvalidMoveException.class, ()->board.putCard(fox2,new Slot(1,0)));
+        assertThrows(IndexOutOfBoundsException.class, ()->board.putCard(fox2,new Slot(1,5)));
+        board.putCard(meadow1,new Slot(2,0));
+        board.putCard(meadow2,new Slot(2,1));
+        board.putCard(river2,new Slot(2,2));
+        board.putCard(river3,new Slot(2,3));
+        board.putCard(river4,new Slot(2,4));
+        board.putCard(meadow3,new Slot(3,0));
+        board.putCard(bee1,new Slot(3,1));
+        board.putCard(bear1,new Slot(3,2));
+        board.putCard(fish1,new Slot(3,3));
+        board.putCard(dragonfly1,new Slot(3,4));
+        board.putCard(meadow4,new Slot(4,0));//board gets cut down to 5x4
+        board.putCard(wolf2,new Slot(3,1));
+        board.putCard(wolf3,new Slot(3,2));
+        board.putCard(rabbit1,new Slot(3,3));
+        board.putCard(eagle1,new Slot(3,4));
 
         var expectedBoard =new ArrayList<ArrayList<Card>>();
         expectedBoard.add(new ArrayList<>(Arrays.asList(fox1   ,elk1   ,wolf1 ,river1 ,fox2)));

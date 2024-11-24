@@ -72,4 +72,6 @@ public interface Card {
     static PlayerCard toPlayerCard(CardType cardType){
         return new PlayerCard(cardType.toString());
     }
+
+
 }

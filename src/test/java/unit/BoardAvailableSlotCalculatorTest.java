@@ -30,12 +30,6 @@ public class BoardAvailableSlotCalculatorTest {
     private Card bear= new BearCard();
 
     private BoardAvailableMoveCalculator calculator;
-    @BeforeEach
-    void prep(){
-        board = new Board();
-        calculator = new BoardAvailableMoveCalculator(board);
-
-    }
 
     @AfterEach
     void finalizeWith(){
@@ -45,11 +39,14 @@ public class BoardAvailableSlotCalculatorTest {
 
     @Test
     void checkAvailableSlotsInBoard2x2(){
+        board = new Board();
         board.getCardBoard().add(new ArrayList<>(Arrays.asList(null,null,null,null,null)));
         board.getCardBoard().add(new ArrayList<>(Arrays.asList(null,null,eagle,fish,null)));
         board.getCardBoard().add(new ArrayList<>(Arrays.asList(null,wolf,bee,null,null)));
         board.getCardBoard().add(new ArrayList<>(Arrays.asList(null,null,null,null,null)));
-
+        board.setSizeVertical(2);
+        board.setSizeHorizontal(2);
+        calculator = new BoardAvailableMoveCalculator(board);
         var expectedAvailableMoves = Set.of(
                 new Slot(0,2),
                 new Slot(0,3),
@@ -66,14 +63,15 @@ public class BoardAvailableSlotCalculatorTest {
 
     @Test
     void checkAvailableSlotsInBoard5x3(){
-
+        board = new Board();
         board.getCardBoard().add(new ArrayList<>(Arrays.asList(null,null,elk,null,null)));
         board.getCardBoard().add(new ArrayList<>(Arrays.asList(null,null,eagle,fish,null)));
         board.getCardBoard().add(new ArrayList<>(Arrays.asList(null,wolf,bee,null,null)));
         board.getCardBoard().add(new ArrayList<>(Arrays.asList(null,null,rabbit,null,null)));
         board.getCardBoard().add(new ArrayList<>(Arrays.asList(null,null,dragonfly,null,null)));
-
-
+        board.setSizeVertical(5);
+        board.setSizeHorizontal(3);
+        calculator = new BoardAvailableMoveCalculator(board);
         var expectedAvailableMoves = Set.of(
                 new Slot(0,1),
                 new Slot(0,3),
@@ -94,13 +92,15 @@ public class BoardAvailableSlotCalculatorTest {
 
     @Test
     void checkAvailableSlotsInBoard3x5(){
+        board = new Board();
         board.getCardBoard().add(new ArrayList<>(Arrays.asList(null,null,null,null,null)));
         board.getCardBoard().add(new ArrayList<>(Arrays.asList(null,null,wolf,null,null)));
         board.getCardBoard().add(new ArrayList<>(Arrays.asList(elk,eagle,bee,fish,dragonfly)));
         board.getCardBoard().add(new ArrayList<>(Arrays.asList(null,null,rabbit,null,null)));
         board.getCardBoard().add(new ArrayList<>(Arrays.asList(null,null,null,null,null)));
-
-
+        calculator = new BoardAvailableMoveCalculator(board);
+        board.setSizeVertical(3);
+        board.setSizeHorizontal(5);
         var expectedAvailableMoves = Set.of(
                 new Slot(0,2),
                 new Slot(1,0),
