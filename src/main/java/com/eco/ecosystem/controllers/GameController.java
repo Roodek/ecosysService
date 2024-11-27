@@ -3,6 +3,7 @@ package com.eco.ecosystem.controllers;
 import com.eco.ecosystem.controllers.requestBodies.PlayerNameBody;
 import com.eco.ecosystem.dto.GameDto;
 import com.eco.ecosystem.entities.Message;
+import com.eco.ecosystem.entities.Player;
 import com.eco.ecosystem.services.GameService;
 import com.eco.ecosystem.services.PlayerService;
 import org.bson.json.JsonObject;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -28,7 +30,18 @@ public class GameController {
 
     @GetMapping
     public Flux<GameDto> getGames() {
-        return gameService.getAllGames();
+        return gameService.getAllGames()
+                .map(gameDto -> new GameDto(
+                        gameDto.getId(),
+                        gameDto.getPlayers().stream()
+                                .map(player->new Player(player.getId(),player.getName(),
+                                        null,
+                                        null,
+                                        null,0))
+                                .toList(),
+                        List.of(),
+                        gameDto.getTurn()
+                ));
     }
 
     @PostMapping
@@ -63,7 +76,7 @@ public class GameController {
     @PostMapping("{id}/start")
     public Mono<Void> startGame(@PathVariable UUID id) {
         return gameService.startGame(id).then(Mono.fromRunnable(() -> {
-            simpMessagingTemplate.convertAndSend("/topic/games", new Message(id.toString(), "game started"));
+            simpMessagingTemplate.convertAndSend("/topic/games", new Message(id.toString(), "game"+ id + " started"));
             simpMessagingTemplate.convertAndSend("/topic/games/" + id, new Message(id.toString(), "GAME_STARTED"));
         }));
 
