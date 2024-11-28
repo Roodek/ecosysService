@@ -237,6 +237,21 @@ public class GameScenarioTest extends ScenarioTest {
         board1res = createPutCardRequest(GAME_ID,PLAYER1_ID,new PutCardRequestBody(Card.CardType.MEADOW,new Slot(2,0)));
         board2res = createPutCardRequest(GAME_ID,PLAYER2_ID,new PutCardRequestBody(Card.CardType.WOLF,new Slot(2,0)));
         board3res = createPutCardRequest(GAME_ID,PLAYER3_ID,new PutCardRequestBody(Card.CardType.RIVER,new Slot(2,0)));
+
+        board1res = createPutCardRequest(GAME_ID,PLAYER1_ID,new PutCardRequestBody(Card.CardType.MEADOW,new Slot(3,0)));
+        board2res = createPutCardRequest(GAME_ID,PLAYER2_ID,new PutCardRequestBody(Card.CardType.FISH,new Slot(3,0)));
+        board3res = createPutCardRequest(GAME_ID,PLAYER3_ID,new PutCardRequestBody(Card.CardType.FISH,new Slot(3,0)));
+
+        board1res = createPutCardRequest(GAME_ID,PLAYER1_ID,new PutCardRequestBody(Card.CardType.MEADOW,new Slot(3,1)));
+        board2res = createPutCardRequest(GAME_ID,PLAYER2_ID,new PutCardRequestBody(Card.CardType.MEADOW,new Slot(3,1)));
+        board3res = createPutCardRequest(GAME_ID,PLAYER3_ID,new PutCardRequestBody(Card.CardType.RIVER,new Slot(3,1)));
+
+        board1res = createPutCardRequest(GAME_ID,PLAYER1_ID,new PutCardRequestBody(Card.CardType.BEAR,new Slot(3,2)));
+        board2res = createPutCardRequest(GAME_ID,PLAYER2_ID,new PutCardRequestBody(Card.CardType.RABBIT,new Slot(3,2)));
+        board3res = createPutCardRequest(GAME_ID,PLAYER3_ID,new PutCardRequestBody(Card.CardType.DRAGONFLY,new Slot(3,2)));
+
+        var gameAfterEnd = getGameWithID(UUID.fromString(GAME_ID));
+        gameAfterEnd.getPlayers().forEach(Player::printBoard);
         //List.of(getAvailableMoves(GAME_ID,PLAYER1_ID),getAvailableMoves(GAME_ID,PLAYER2_ID),getAvailableMoves(GAME_ID,PLAYER3_ID));
 
     }

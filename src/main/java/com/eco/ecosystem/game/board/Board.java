@@ -80,6 +80,9 @@ public class Board {
             }
             System.out.println();
         }
+        System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+        System.out.println("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv");
+        System.out.println();
     }
 
     public Card getCardAtSlot(Slot slot) {
@@ -132,20 +135,17 @@ public class Board {
         if (slot.coordX() == 0 && sizeVertical < 5) {
             addNewFirstRow();
             sizeVertical++;
-            checkIfMaxDimensionsAndCutBoardToAllowedDimension();
         } else if (slot.coordX() == sizeVertical + 1 && sizeVertical < 5) {
             addNewLastRow();
             sizeVertical++;
-            checkIfMaxDimensionsAndCutBoardToAllowedDimension();
         } else if (slot.coordY() == 0 && sizeHorizontal < 5) {
             addNewFirstColumn();
             sizeHorizontal++;
-            checkIfMaxDimensionsAndCutBoardToAllowedDimension();
         } else if (slot.coordY() == sizeHorizontal + 1 && sizeHorizontal < 5) {
             addNewLastColumn();
             sizeHorizontal++;
-            checkIfMaxDimensionsAndCutBoardToAllowedDimension();
         }
+        checkIfMaxDimensionsAndCutBoardToAllowedDimension();
     }
 
     private void rabbitSwap(Slot card1, Slot card2) {
@@ -167,6 +167,7 @@ public class Board {
         if (sizeVertical == maxVerticalSize && cardBoard.get(0).stream().allMatch(Objects::isNull)) {
             cardBoard = new ArrayList<>(cardBoard.subList(1, maxVerticalSize + 1));
             maxHorizontalSize = 4;
+            checkIfMaxHorizontalAndCutBoardTo4x5();
         }
     }
 
@@ -174,6 +175,7 @@ public class Board {
         if (sizeHorizontal == maxHorizontalSize && cardBoard.stream().map(row->row.get(0)).allMatch(Objects::isNull)) {
             cardBoard.replaceAll(cards -> new ArrayList<>(cards.subList(1, maxHorizontalSize + 1)));
             maxVerticalSize = 4;
+            checkIfMaxVerticalAndCutBoardTo5x4();
         }
     }
 

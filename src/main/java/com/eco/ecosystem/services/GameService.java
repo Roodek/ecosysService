@@ -79,7 +79,7 @@ public class GameService {
 
     public Mono<UUID> joinGame(UUID gameID, String playerName) {
         var newPlayeruuid = UUID.randomUUID();
-        var newPlayer = new Player(newPlayeruuid, playerName, List.of(),null, List.of(List.of()), 0);
+        var newPlayer = new Player(newPlayeruuid, playerName, List.of(), null, List.of(List.of()), 0);
         Query query = new Query(
                 Criteria.where(Game.ID_FIELD).is(gameID));
         Update update = new Update()
@@ -139,12 +139,21 @@ public class GameService {
         return getGame(gameID)
                 .flatMap(gameDto -> arePlayerCommitted(gameDto.getPlayers()) ?
                         startNewTurn(gameDto)
-                                .map(updatedGame->{
-                                    simpMessagingTemplate.convertAndSend("/topic/games/" + gameID.toString(),
-                                            new Message(gameID.toString(), "TURN_ENDED"));
+                                .map(updatedGame -> {
+                                    sendMessageBaseOnGameTurn(gameID, updatedGame);
                                     return updatedGame;
                                 }) :
                         Mono.just(gameDto));
+    }
+
+    private void sendMessageBaseOnGameTurn(UUID gameID, GameDto updatedGame) {
+        if (updatedGame.getTurn() == 20) {
+            simpMessagingTemplate.convertAndSend("/topic/games/" + gameID.toString(),
+                    new Message(gameID.toString(), "GAME_ENDED"));
+        } else {
+            simpMessagingTemplate.convertAndSend("/topic/games/" + gameID.toString(),
+                    new Message(gameID.toString(), "TURN_ENDED"));
+        }
     }
 
     private Mono<GameDto> startNewTurn(GameDto gameDto) {
@@ -153,31 +162,34 @@ public class GameService {
             try {
                 applySelectedMove(player);
                 player.setSelectedMove(null);
-            }catch (InvalidMoveException e){
+            } catch (InvalidMoveException e) {
                 player.setSelectedMove(null);
             }
             return player;
         }).toList());
-        if(gameCopy.allPlayersAppliedMove()){
-            if(gameCopy.getTurn()==HALF_GAME_TURN){
-                gameCopy.startSecondPhase();
-            }else{
-                gameCopy.swapPlayersHands();
-            }
-            if(gameCopy.getTurn()==20){
-                updateGame(gameCopy.endGame(),gameCopy.getId());
-            }
-            gameCopy.setTurn(gameCopy.getTurn()+1);
-            return updateGame(gameCopy,gameCopy.getId());
-        }else{
-            return Mono.just(gameCopy);
+        return gameCopy.allPlayersAppliedMove() ?
+                handleHalfTurnOrEndGame(gameCopy) :
+                Mono.just(gameCopy);
+    }
+
+    private Mono<GameDto> handleHalfTurnOrEndGame(GameDto gameCopy) {
+        if (gameCopy.getTurn() == HALF_GAME_TURN) {
+            gameCopy.startSecondPhase();
+        } else {
+            gameCopy.swapPlayersHands();
         }
+        if (gameCopy.getTurn() == 20) {
+            gameCopy.setTurn(gameCopy.getTurn() + 1);
+            return updateGame(gameCopy.endGame(), gameCopy.getId());
+        }
+        gameCopy.setTurn(gameCopy.getTurn() + 1);
+        return updateGame(gameCopy, gameCopy.getId());
     }
 
     private void applySelectedMove(Player player) throws InvalidMoveException {
         var updatedBoard = player.getSelectedMove().getSelectedCard() == Card.CardType.RABBIT
-                && player.getSelectedMove().getSlotToSwap1()!=null 
-                && player.getSelectedMove().getSlotToSwap2()!=null?
+                && player.getSelectedMove().getSlotToSwap1() != null
+                && player.getSelectedMove().getSlotToSwap2() != null ?
                 new Board(player.getBoard())
                         .putRabbitCard(
                                 player.getSelectedMove().getSelectedSlot(),
@@ -193,6 +205,7 @@ public class GameService {
         player.setCardsInHand(removeCardFromPlayersHand(player));
         player.setBoard(updatedBoard.toResponseBoard());
     }
+
     private List<PlayerCard> removeCardFromPlayersHand(Player player) {
         var result = new ArrayList<>(player.getCardsInHand());
         Iterator<PlayerCard> itr = result.iterator();
@@ -206,6 +219,6 @@ public class GameService {
     }
 
     private boolean arePlayerCommitted(List<Player> players) {
-        return players.stream().allMatch(player -> player.getSelectedMove()!=null);
+        return players.stream().allMatch(player -> player.getSelectedMove() != null);
     }
 }

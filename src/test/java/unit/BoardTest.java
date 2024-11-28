@@ -167,16 +167,15 @@ class BoardTest {
         assertEquals(5, board.getSizeHorizontal());
 
         assertEquals(expectedBoard,board.getCardBoard());
-        board.putCard(meadow,new Slot(0,4));
-        board.putCard(dragonfly,new Slot(0,4));
-        board.putCard(fish,new Slot(0,4));
+        board.putCard(meadow,new Slot(0,2));
+        board.putCard(dragonfly,new Slot(0,2));
+        board.putCard(fish,new Slot(0,2));
 
         var expectedBoard2 = new ArrayList<ArrayList<Card>>();
         expectedBoard2.add(new ArrayList<>(Arrays.asList(null,null,null,null,fish)));
         expectedBoard2.add(new ArrayList<>(Arrays.asList(null,null,null,null,dragonfly)));
         expectedBoard2.add(new ArrayList<>(Arrays.asList(null,null,null,null,meadow)));
         expectedBoard2.add(new ArrayList<>(Arrays.asList(fox,elk,bee,river,wolf)));
-
 
         assertEquals(expectedBoard2,board.getCardBoard());
     }
@@ -209,7 +208,6 @@ class BoardTest {
         assertEquals(5, board.getSizeVertical());
         assertEquals(1, board.getSizeHorizontal());
 
-
         assertEquals(expectedBoard,board.getCardBoard());
         board.putCard(meadow,new Slot(0,0));
         board.putCard(dragonfly,new Slot(0,0));
@@ -234,8 +232,128 @@ class BoardTest {
         expectedBoard3.add(new ArrayList<>(Arrays.asList(null,null,null,wolf)));
 
         assertEquals(expectedBoard3.toString(),board.getCardBoard().toString());
-
     }
+
+    @Test
+    void checkIfBoardLimitedProperlyTo4x5WhenCrossLikeBoard() throws InvalidMoveException {
+        var wolf = new WolfCard();
+        var river = new RiverCard();
+        var bee = new BeeCard();
+        var elk = new ElkCard();
+        var fox = new FoxCard();
+
+        var meadow = new MeadowCard();
+        var dragonfly = new DragonflyCard();
+        var fish= new FishCard();
+
+        board.putFirstCard(wolf);
+        board.putCard(river,new Slot(0,1));
+        board.putCard(bee,new Slot(0,1));
+        board.putCard(elk,new Slot(0,1));
+
+        var expectedBoard =new ArrayList<ArrayList<Card>>();
+        expectedBoard.add(new ArrayList<>(Arrays.asList(null,null,null)));
+        expectedBoard.add(new ArrayList<>(Arrays.asList(null,elk,null)));
+        expectedBoard.add(new ArrayList<>(Arrays.asList(null,bee,null)));
+        expectedBoard.add(new ArrayList<>(Arrays.asList(null,river,null)));
+        expectedBoard.add(new ArrayList<>(Arrays.asList(null,wolf,null)));
+        expectedBoard.add(new ArrayList<>(Arrays.asList(null,null,null)));
+
+        assertEquals(4, board.getSizeVertical());
+        assertEquals(1, board.getSizeHorizontal());
+
+        assertEquals(expectedBoard,board.getCardBoard());
+        board.putCard(meadow,new Slot(2,2));
+        board.putCard(dragonfly,new Slot(2,3));
+        board.putCard(fish,new Slot(2,0));
+
+        var expectedBoard2 = new ArrayList<ArrayList<Card>>();
+        expectedBoard2.add(new ArrayList<>(Arrays.asList(null,null,null, null,   null,     null)));
+        expectedBoard2.add(new ArrayList<>(Arrays.asList(null,null,elk,  null,   null,      null)));
+        expectedBoard2.add(new ArrayList<>(Arrays.asList(null,fish,bee,  meadow, dragonfly,null)));
+        expectedBoard2.add(new ArrayList<>(Arrays.asList(null,null,river,null,   null,    null)));
+        expectedBoard2.add(new ArrayList<>(Arrays.asList(null,null,wolf, null,   null,     null)));
+        expectedBoard2.add(new ArrayList<>(Arrays.asList(null,null,null, null,   null,     null)));
+
+        assertEquals(4, board.getSizeVertical());
+        assertEquals(4, board.getSizeHorizontal());
+        board.printBoard();
+        assertEquals(expectedBoard2,board.getCardBoard());
+        Card rabbit = new RabbitCard();
+        board.putRabbitCard(new Slot(2,0),new Slot(2,0),new Slot(2,3));
+
+        var expectedBoard3 = new ArrayList<ArrayList<Card>>();
+        expectedBoard3.add(new ArrayList<>(Arrays.asList(null,null,elk,  null,   null)));
+        expectedBoard3.add(new ArrayList<>(Arrays.asList(meadow,fish,bee,  rabbit, dragonfly)));
+        expectedBoard3.add(new ArrayList<>(Arrays.asList(null,null,river,null,   null)));
+        expectedBoard3.add(new ArrayList<>(Arrays.asList(null,null,wolf, null,   null)));
+
+        assertEquals(4, board.getSizeVertical());
+        assertEquals(5, board.getSizeHorizontal());
+        assertEquals(expectedBoard3.toString(),board.getCardBoard().toString());
+    }
+
+    @Test
+    void checkIfBoardLimitedProperlyTo5x4WhenCrossLikeBoard() throws InvalidMoveException {
+        var wolf = new WolfCard();
+        var river = new RiverCard();
+        var bee = new BeeCard();
+        var elk = new ElkCard();
+        var fox = new FoxCard();
+
+        var meadow = new MeadowCard();
+        var dragonfly = new DragonflyCard();
+        var fish= new FishCard();
+
+        board.putFirstCard(wolf);
+        board.putCard(river,new Slot(0,1));
+        board.putCard(bee,new Slot(0,1));
+        board.putCard(elk,new Slot(0,1));
+
+        var expectedBoard =new ArrayList<ArrayList<Card>>();
+        expectedBoard.add(new ArrayList<>(Arrays.asList(null,null,null)));
+        expectedBoard.add(new ArrayList<>(Arrays.asList(null,elk,null)));
+        expectedBoard.add(new ArrayList<>(Arrays.asList(null,bee,null)));
+        expectedBoard.add(new ArrayList<>(Arrays.asList(null,river,null)));
+        expectedBoard.add(new ArrayList<>(Arrays.asList(null,wolf,null)));
+        expectedBoard.add(new ArrayList<>(Arrays.asList(null,null,null)));
+
+        assertEquals(4, board.getSizeVertical());
+        assertEquals(1, board.getSizeHorizontal());
+
+        assertEquals(expectedBoard,board.getCardBoard());
+        board.putCard(meadow,new Slot(2,2));
+        board.putCard(dragonfly,new Slot(2,3));
+        board.putCard(fish,new Slot(2,0));
+
+        var expectedBoard2 = new ArrayList<ArrayList<Card>>();
+        expectedBoard2.add(new ArrayList<>(Arrays.asList(null,null,null, null,   null,     null)));
+        expectedBoard2.add(new ArrayList<>(Arrays.asList(null,null,elk,  null,   null,      null)));
+        expectedBoard2.add(new ArrayList<>(Arrays.asList(null,fish,bee,  meadow, dragonfly,null)));
+        expectedBoard2.add(new ArrayList<>(Arrays.asList(null,null,river,null,   null,    null)));
+        expectedBoard2.add(new ArrayList<>(Arrays.asList(null,null,wolf, null,   null,     null)));
+        expectedBoard2.add(new ArrayList<>(Arrays.asList(null,null,null, null,   null,     null)));
+
+        assertEquals(4, board.getSizeVertical());
+        assertEquals(4, board.getSizeHorizontal());
+        board.printBoard();
+        assertEquals(expectedBoard2,board.getCardBoard());
+        Card rabbit = new RabbitCard();
+        board.putRabbitCard(new Slot(5,2),new Slot(2,2),new Slot(2,3));
+
+        var expectedBoard3 = new ArrayList<ArrayList<Card>>();
+        expectedBoard3.add(new ArrayList<>(Arrays.asList(null,elk,  null,   null)));
+        expectedBoard3.add(new ArrayList<>(Arrays.asList(fish,meadow,  bee, dragonfly)));
+        expectedBoard3.add(new ArrayList<>(Arrays.asList(null,river,null,   null)));
+        expectedBoard3.add(new ArrayList<>(Arrays.asList(null,wolf, null,   null)));
+        expectedBoard3.add(new ArrayList<>(Arrays.asList(null,rabbit, null,   null)));
+
+        assertEquals(5, board.getSizeVertical());
+        assertEquals(4, board.getSizeHorizontal());
+        assertEquals(expectedBoard3.toString(),board.getCardBoard().toString());
+    }
+
+
     @Test
     void testSwapCards() throws InvalidMoveException {
         var wolf = new WolfCard();
