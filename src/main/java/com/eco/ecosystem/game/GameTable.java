@@ -26,13 +26,23 @@ public class GameTable {
     }
 
     public List<GamePlayer> endGame() {
-        gamePlayers.forEach(this::countAllCardPointsAndPutThemToGeneralPointCount);
+        gamePlayers.forEach(this::prepareCardPointsForPlayer);
+
         compareWolvesAndAssignPoints();
         compareRiversAndAssignPoints();
-        return gamePlayers.stream().peek(gamePlayer -> {
-            countEcosystemGapsPoints(gamePlayer);
-            sumAllPoints(gamePlayer);
-        }).toList();
+
+        gamePlayers.forEach(this::calculateGapsAndSumAllPoints);
+        return gamePlayers;
+    }
+
+    private void calculateGapsAndSumAllPoints(GamePlayer gamePlayer) {
+        countEcosystemGapsPoints(gamePlayer);
+        sumAllPoints(gamePlayer);
+    }
+
+    private void prepareCardPointsForPlayer(GamePlayer gamePlayer) {
+        gamePlayer.getBoard().establishCardRelationships();
+        this.countAllCardPointsAndPutThemToGeneralPointCount(gamePlayer);
     }
 
     public void countAllCardPointsAndPutThemToGeneralPointCount(GamePlayer gamePlayer) {

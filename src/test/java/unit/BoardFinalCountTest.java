@@ -214,7 +214,7 @@ public class BoardFinalCountTest extends CardTest {
     }
 
     @Test
-    void simulateExample4GamePlayerGame1() throws InvalidCardTypeException {
+    void simulateExample4GamePlayerGame1(){
         //player1
 
         var rodekCardBoard =new ArrayList<ArrayList<Card>>();

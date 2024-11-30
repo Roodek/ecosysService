@@ -172,9 +172,9 @@ class BoardTest {
         board.putCard(fish,new Slot(0,2));
 
         var expectedBoard2 = new ArrayList<ArrayList<Card>>();
-        expectedBoard2.add(new ArrayList<>(Arrays.asList(null,null,null,null,fish)));
-        expectedBoard2.add(new ArrayList<>(Arrays.asList(null,null,null,null,dragonfly)));
-        expectedBoard2.add(new ArrayList<>(Arrays.asList(null,null,null,null,meadow)));
+        expectedBoard2.add(new ArrayList<>(Arrays.asList(null,null,fish,null,null)));
+        expectedBoard2.add(new ArrayList<>(Arrays.asList(null,null,dragonfly,null,null)));
+        expectedBoard2.add(new ArrayList<>(Arrays.asList(null,null,meadow,null,null)));
         expectedBoard2.add(new ArrayList<>(Arrays.asList(fox,elk,bee,river,wolf)));
 
         assertEquals(expectedBoard2,board.getCardBoard());

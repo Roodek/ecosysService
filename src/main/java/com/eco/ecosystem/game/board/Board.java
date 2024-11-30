@@ -105,6 +105,7 @@ public class Board {
     public Board putCard(Card card, Slot slot) throws InvalidMoveException {
         return putCardAndPerformAction(card,slot,null,null);
     }
+
     private Board putCardAndPerformAction(Card card, Slot slot,Slot slotToSwap1,Slot slotToSwap2) throws IndexOutOfBoundsException, InvalidMoveException {
         if (isBoardCompleted()) {
             throw new InvalidMoveException("Invalid move, board is already completed");
@@ -125,23 +126,22 @@ public class Board {
             handlePossibleBoardSizeChange(slot);
         }
         if (isBoardCompleted()) {
-            assignNeighbours();
-            mergeRiversAndMeadows();
+            establishCardRelationships();
         }
         return this;
     }
 
     private void handlePossibleBoardSizeChange(Slot slot) {
-        if (slot.coordX() == 0 && sizeVertical < 5) {
+        if (slot.coordX() == 0 && sizeVertical < maxVerticalSize) {
             addNewFirstRow();
             sizeVertical++;
-        } else if (slot.coordX() == sizeVertical + 1 && sizeVertical < 5) {
+        } else if (slot.coordX() == sizeVertical + 1 && sizeVertical < maxVerticalSize) {
             addNewLastRow();
             sizeVertical++;
-        } else if (slot.coordY() == 0 && sizeHorizontal < 5) {
+        } else if (slot.coordY() == 0 && sizeHorizontal < maxHorizontalSize) {
             addNewFirstColumn();
             sizeHorizontal++;
-        } else if (slot.coordY() == sizeHorizontal + 1 && sizeHorizontal < 5) {
+        } else if (slot.coordY() == sizeHorizontal + 1 && sizeHorizontal < maxHorizontalSize) {
             addNewLastColumn();
             sizeHorizontal++;
         }
@@ -206,7 +206,7 @@ public class Board {
         this.cardBoard = newBoard;
     }
 
-    private void assignNeighbours() {
+    public void establishCardRelationships() {
         var assignNeighboursStrategy = new AssignNeighboursToCardsStrategy(this);
         BoardSlotProcessor.iterateOverBoardEntriesAndApplyStrategy(cardBoard, assignNeighboursStrategy);
         mergeRiversAndMeadows();
