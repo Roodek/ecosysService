@@ -16,7 +16,10 @@ public class CorsConfig {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
 
         // Define which origins are allowed to access the application
-        corsConfiguration.setAllowedOrigins(List.of("http://localhost:3000","http://192.168.112:3000")); // Add your frontend origin here
+        corsConfiguration.setAllowedOrigins(List.of(
+                "http://localhost:3000",
+                "http://192.168.112:3000",
+                "https://roodek.github.io/ecosysFront/")); // Add your frontend origin here
         // Allow credentials if your frontend needs them (e.g., cookies, authorization headers)
         corsConfiguration.setAllowCredentials(true);
 
