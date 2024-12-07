@@ -6,10 +6,7 @@ import com.eco.ecosystem.controllers.requestBodies.PutCardRequestBody;
 import com.eco.ecosystem.controllers.requestBodies.PutRabbitCardAndSwapTwoRequestBody;
 import com.eco.ecosystem.controllers.responseObjects.AvailableMovesResponse;
 import com.eco.ecosystem.controllers.responseObjects.GameResponse;
-import com.eco.ecosystem.entities.Game;
-import com.eco.ecosystem.entities.Player;
-import com.eco.ecosystem.entities.PlayerCard;
-import com.eco.ecosystem.entities.SelectedMove;
+import com.eco.ecosystem.entities.*;
 import com.eco.ecosystem.game.board.Board;
 import com.eco.ecosystem.game.board.BoardAvailableMoveCalculator;
 import com.eco.ecosystem.game.board.Slot;
@@ -21,6 +18,7 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import utils.AppUtils;
@@ -32,6 +30,8 @@ public class PlayerService {
 
     @Autowired
     ReactiveMongoTemplate reactiveMongoTemplate;
+    @Autowired
+    SimpMessagingTemplate simpMessagingTemplate;
 
     @Autowired
     GameService gameService;
@@ -82,6 +82,10 @@ public class PlayerService {
         return getPlayer(gameID, playerID)
                 .flatMap(player -> player.getSelectedMove() != null ? Mono.error(new IllegalMoveException("card already selected"))
                         : putCardOnPlayersBoard(gameID, playerID, body, player)
+                        .then(Mono.fromRunnable(
+                                () -> simpMessagingTemplate.convertAndSend("/topic/games/" + gameID.toString(),
+                                        new Message(playerID.toString(), "MOVE_SUBMITTED")))
+                        )
                         .then(gameService.updateGameStateIfTurnEnded(gameID)).map(AppUtils::gameDtoToResponse));
     }
 
@@ -89,6 +93,10 @@ public class PlayerService {
         return getPlayer(gameID, playerID)
                 .flatMap(player -> player.getSelectedMove() != null ? Mono.error(new IllegalMoveException("card already selected"))
                         : putRabbitCardOnBoard(gameID, playerID, body, player)
+                        .then(Mono.fromRunnable(
+                                () -> simpMessagingTemplate.convertAndSend("/topic/games/" + gameID.toString(),
+                                        new Message(playerID.toString(), "MOVE_SUBMITTED")))
+                        )
                         .then(gameService.updateGameStateIfTurnEnded(gameID)).map(AppUtils::gameDtoToResponse)
                 );
     }
