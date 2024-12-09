@@ -8,6 +8,7 @@ import com.eco.ecosystem.game.exceptions.FullPlayerCountException;
 import com.eco.ecosystem.game.exceptions.GameNotFoundException;
 import com.eco.ecosystem.game.exceptions.InvalidMoveException;
 import com.eco.ecosystem.repository.GameRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.FindAndReplaceOptions;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Slf4j
 public class GameService {
 
     public static final int HALF_GAME_TURN = 10;
@@ -139,16 +141,16 @@ public class GameService {
 
     public Mono<GameDto> updateGameStateIfTurnEnded(UUID gameID) {
         return getGame(gameID)
-                .flatMap(gameDto -> arePlayerCommitted(gameDto.getPlayers()) ?
+                .flatMap(gameDto -> arePlayersCommitted(gameDto.getPlayers()) ?
                         startNewTurn(gameDto)
                                 .map(updatedGame -> {
-                                    sendMessageBaseOnGameTurn(gameID, updatedGame);
+                                    sendMessageBasedOnGameTurn(gameID, updatedGame);
                                     return updatedGame;
                                 }) :
                         Mono.just(gameDto));
     }
 
-    private void sendMessageBaseOnGameTurn(UUID gameID, GameDto updatedGame) {
+    private void sendMessageBasedOnGameTurn(UUID gameID, GameDto updatedGame) {
         if (updatedGame.getTurn() == 20) {
             simpMessagingTemplate.convertAndSend("/topic/games/" + gameID.toString(),
                     new Message(gameID.toString(), "GAME_ENDED"));
@@ -160,32 +162,39 @@ public class GameService {
 
     private Mono<GameDto> startNewTurn(GameDto gameDto) {
         var gameCopy = new GameDto(gameDto);
-        gameCopy.setPlayers(gameCopy.getPlayers().stream().map(player -> {
-            try {
-                applySelectedMove(player);
-                player.setSelectedMove(null);
-            } catch (InvalidMoveException e) {
-                player.setSelectedMove(null);
-            }
-            return player;
-        }).toList());
+        gameCopy.setPlayers(
+                gameCopy.getPlayers().stream()
+                .map(this::processPlayerOnEndOfTurn).toList()
+        );
         return gameCopy.allPlayersAppliedMove() ?
-                handleHalfTurnOrEndGame(gameCopy) :
+                handleEndOfTurn(gameCopy) :
                 Mono.just(gameCopy);
     }
 
-    private Mono<GameDto> handleHalfTurnOrEndGame(GameDto gameCopy) {
-        if (gameCopy.getTurn() == HALF_GAME_TURN) {
-            gameCopy.startSecondPhase();
+    private Player processPlayerOnEndOfTurn(Player player) {
+        try {
+            applySelectedMove(player);
+        } catch (InvalidMoveException e) {
+            log.error(e.getLocalizedMessage());
+        }
+        finally {
+            player.setSelectedMove(null);
+        }
+        return player;
+    }
+
+    private Mono<GameDto> handleEndOfTurn(GameDto gameDto) {
+        if (gameDto.getTurn() == HALF_GAME_TURN) {
+            gameDto.startSecondPhase();
         } else {
-            gameCopy.swapPlayersHands();
+            gameDto.swapPlayersHands();
         }
-        if (gameCopy.getTurn() == 20) {
-            gameCopy.setTurn(gameCopy.getTurn() + 1);
-            return updateGame(gameCopy.endGame(), gameCopy.getId());
+        if (gameDto.getTurn() == 20) {
+            gameDto.setTurn(gameDto.getTurn() + 1);
+            return updateGame(gameDto.endGame(), gameDto.getId());
         }
-        gameCopy.setTurn(gameCopy.getTurn() + 1);
-        return updateGame(gameCopy, gameCopy.getId());
+        gameDto.setTurn(gameDto.getTurn() + 1);
+        return updateGame(gameDto, gameDto.getId());
     }
 
     private void applySelectedMove(Player player) throws InvalidMoveException {
@@ -220,7 +229,7 @@ public class GameService {
         return result;
     }
 
-    private boolean arePlayerCommitted(List<Player> players) {
+    private boolean arePlayersCommitted(List<Player> players) {
         return players.stream().allMatch(player -> player.getSelectedMove() != null);
     }
 }
