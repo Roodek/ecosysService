@@ -50,7 +50,7 @@ public class GameDto{
                 .filter(Objects::nonNull).count()==turn);
     }
     public GameDto swapPlayersHands() {
-        if (turn < HALF_GAME_TURN) {
+        if (turn <= HALF_GAME_TURN) {
             List<PlayerCard> swapped = players.get(0).getCardsInHand();
             List<PlayerCard> buffer;
             for (int i = players.size() - 1; i >= 0; i--) {

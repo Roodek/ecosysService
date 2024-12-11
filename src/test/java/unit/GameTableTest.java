@@ -16,7 +16,7 @@ public class GameTableTest {
 
     @Test
     void testSwapHands() {
-        var player1 = initPlayerHand("player2",List.of(new PlayerCard(Card.from(Card.CardType.BEE))));
+        var player1 = initPlayerHand("player1",List.of(new PlayerCard(Card.from(Card.CardType.BEE))));
         var player2 = initPlayerHand("player2",List.of(new PlayerCard(Card.from(Card.CardType.ELK))));
         var player3 = initPlayerHand("player3",List.of(new PlayerCard(Card.from(Card.CardType.RIVER))));
         var gameTable = new Game();
@@ -32,11 +32,14 @@ public class GameTableTest {
         assertEquals(Card.CardType.ELK.toString(),game.getPlayers().get(0).getCardsInHand().get(0).getCardType());
         assertEquals( Card.CardType.RIVER.toString(), game.getPlayers().get(1).getCardsInHand().get(0).getCardType());
         assertEquals(Card.CardType.BEE.toString(), game.getPlayers().get(2).getCardsInHand().get(0).getCardType());
+
         game.setTurn(10);
+        game.swapPlayersHands();
 
         assertEquals(Card.CardType.RIVER.toString(),game.getPlayers().get(0).getCardsInHand().get(0).getCardType());
-        assertEquals( Card.CardType.BEE.toString(), game.getPlayers().get(1).getCardsInHand().get(0).getCardType());
+        assertEquals(Card.CardType.BEE.toString(),game.getPlayers().get(1).getCardsInHand().get(0).getCardType());
         assertEquals(Card.CardType.ELK.toString(), game.getPlayers().get(2).getCardsInHand().get(0).getCardType());
+
         game.setTurn(11);
         game.swapPlayersHands();
 
@@ -46,6 +49,7 @@ public class GameTableTest {
 
         game.setTurn(12);
         game.swapPlayersHands();
+
         assertEquals(Card.CardType.BEE.toString(),game.getPlayers().get(0).getCardsInHand().get(0).getCardType());
         assertEquals(Card.CardType.ELK.toString(),game.getPlayers().get(1).getCardsInHand().get(0).getCardType());
         assertEquals(Card.CardType.RIVER.toString(), game.getPlayers().get(2).getCardsInHand().get(0).getCardType());

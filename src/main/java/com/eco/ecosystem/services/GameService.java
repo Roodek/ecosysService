@@ -31,7 +31,7 @@ import java.util.UUID;
 @Slf4j
 public class GameService {
 
-    public static final int HALF_GAME_TURN = 11;
+    public static final int HALF_GAME_TURN = 10;
     @Autowired
     SimpMessagingTemplate simpMessagingTemplate;
     @Autowired
