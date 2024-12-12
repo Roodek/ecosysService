@@ -34,7 +34,6 @@ public class WebSocketController {
     @SendTo("/topic/games/{id}")  // Sends responses to "/topic/messages/{id}" for subscribers
     public Message receiveTargetedMessage(@DestinationVariable String id, @Payload Message message) {
         // Process and return the message (here we just return the received message)
-        message.setContent(id+" : " +message.getContent());
         return message;
     }
 
