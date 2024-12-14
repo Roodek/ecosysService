@@ -8,6 +8,7 @@ import com.eco.ecosystem.game.exceptions.FullPlayerCountException;
 import com.eco.ecosystem.game.exceptions.GameNotFoundException;
 import com.eco.ecosystem.game.exceptions.InvalidMoveException;
 import com.eco.ecosystem.repository.GameRepository;
+import com.mongodb.internal.client.model.FindOptions;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +40,10 @@ public class GameService {
     @Autowired
     ReactiveMongoTemplate reactiveMongoTemplate;
 
-    public Flux<GameDto> getAllGames() {
-        return gameRepository.findAll().map(AppUtils::gameEntityToDto);
+    public Flux<GameDto> getAllNonStartedGames() {
+        Query query = new Query(
+                Criteria.where(Game.TURN).is(0));
+        return reactiveMongoTemplate.find(query, Game.class).map(AppUtils::gameEntityToDto);
     }
 
     public Mono<GameDto> getGame(UUID id) {

@@ -205,7 +205,7 @@ public class ScenarioTest {
         return "http://localhost:" + port + "/api/v1";
     }
 
-    Response createGetAllGamesRequest() throws IOException {
+    Response createGetAllNonStartedGamesRequest() throws IOException {
         Request request = new Request.Builder().url(new URL(getUrlRoot() + "/games")).build();
         return client.newCall(request).execute();
     }
