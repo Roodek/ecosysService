@@ -96,15 +96,16 @@ public class GameTable {
         awardedPlayers.getOrDefault(2, List.of()).forEach(gamePlayer -> gamePlayer.getGeneralPointCount().put(WOLF, gamePlayer.getBoard().getWolfCount() > 0 ? WolfCard.WOLF_3RD_PLACE_POINTS : 0));
     }
 
-    private Map<Integer, List<GamePlayer>> getRewardedPointsForRankedCard(Card.CardType cardType, Integer podiumPLaces) {
+    private Map<Integer, List<GamePlayer>> getRewardedPointsForRankedCard(Card.CardType cardType, Integer podiumPlaces) {
         var playersGroupedByNumberOfRankedCards = gamePlayers.stream()
                 .sorted(Comparator.comparing(gamePlayer -> getWolfOrRiverCount(gamePlayer, cardType), Comparator.reverseOrder()))
                 .collect(Collectors.groupingBy(gamePlayer -> getWolfOrRiverCount(gamePlayer, cardType), LinkedHashMap::new, Collectors.toList()));
 
         var podium = new HashMap<Integer, List<GamePlayer>>();
         playersGroupedByNumberOfRankedCards.values().forEach(playersGroupedByCardCount -> {
-            if (podium.values().stream().flatMap(Collection::stream).toList().size() < podiumPLaces) {
-                podium.put(podium.size(), playersGroupedByCardCount);
+            var podiumSize = podium.values().stream().flatMap(Collection::stream).toList().size();
+            if (podiumSize < podiumPlaces) {
+                podium.put(podiumSize, playersGroupedByCardCount);
             }
         });
         return Map.copyOf(podium);
