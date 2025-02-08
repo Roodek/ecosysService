@@ -30,7 +30,7 @@ public class GameController {
 
     @GetMapping
     public Flux<GameDto> getGames() {
-        return gameService.getAllGames()
+        return gameService.getAllNonStartedGames()
                 .map(gameDto -> new GameDto(
                         gameDto.getId(),
                         gameDto.getPlayers().stream()

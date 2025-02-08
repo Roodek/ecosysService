@@ -18,6 +18,7 @@ public class Game {
     public static final String COLLECTION_NAME = "games";
     public static final String ID_FIELD = "_id";
     public static final String PLAYERS_FIELD = "players";
+    public static final String TURN = "turn";
     public static final String CARD_STACK_FIELD = "cardStack";
     public static final String CREATED_AT_FIELD = "createdAt";
     @Id
