@@ -6,15 +6,12 @@ import com.eco.ecosystem.entities.PlayerCard;
 import com.eco.ecosystem.services.GameService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.testcontainers.shaded.com.fasterxml.jackson.core.type.TypeReference;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import utils.AppUtils;
 import utils.Timestamp;
 
 import java.io.IOException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -53,14 +50,13 @@ public class ClearOldGamesScenarioTest extends ScenarioTest{
         var dbRecord = AppUtils.gameDtoToEntity(newGame);
 
         reactiveMongoTemplate.save(dbRecord, "games").block();
-        var allGamesResponse = createGetAllGamesRequest();
-        ArrayList<GameDto> allGames = new ObjectMapper().readValue(allGamesResponse.body().string(), new TypeReference<List<GameDto>>(){});
+        var allGames= createGetAllGamesRequest();
+
         assertEquals(2,allGames.size());
 
         gameService.scheduleDeletingOldGames();
+        allGames = createGetAllGamesRequest();
 
-        allGamesResponse = createGetAllGamesRequest();
-        allGames = new ObjectMapper().readValue(allGamesResponse.body().string(), new TypeReference<List<GameDto>>(){});
         assertEquals(1,allGames.size());
 
     }

@@ -8,6 +8,7 @@ import com.eco.ecosystem.controllers.requestBodies.PutRabbitCardAndSwapTwoReques
 import com.eco.ecosystem.controllers.responseObjects.AvailableMovesResponse;
 import com.eco.ecosystem.controllers.responseObjects.GameResponse;
 import com.eco.ecosystem.dto.GameDto;
+import com.eco.ecosystem.entities.Game;
 import com.eco.ecosystem.entities.Player;
 import com.eco.ecosystem.entities.PlayerCard;
 import com.eco.ecosystem.game.cards.Card;
@@ -208,6 +209,10 @@ public class ScenarioTest {
     Response createGetAllNonStartedGamesRequest() throws IOException {
         Request request = new Request.Builder().url(new URL(getUrlRoot() + "/games")).build();
         return client.newCall(request).execute();
+    }
+
+    List<Game> createGetAllGamesRequest(){
+        return reactiveMongoTemplate.findAll(Game.class).collectList().block();
     }
 
     GameDto getGameWithID(UUID gameID) throws IOException {
