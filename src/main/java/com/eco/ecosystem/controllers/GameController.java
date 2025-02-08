@@ -40,7 +40,8 @@ public class GameController {
                                         null,0))
                                 .toList(),
                         List.of(),
-                        gameDto.getTurn()
+                        gameDto.getTurn(),
+                        gameDto.getCreatedAt()
                 ));
     }
 

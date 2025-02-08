@@ -11,6 +11,7 @@ import com.eco.ecosystem.dto.GameDto;
 import com.eco.ecosystem.entities.Player;
 import com.eco.ecosystem.entities.PlayerCard;
 import com.eco.ecosystem.game.cards.Card;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +24,6 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import utils.AppUtils;
 
 import java.io.IOException;
@@ -296,14 +296,5 @@ public class ScenarioTest {
         assertTrue(createdGame.getPlayers().stream().allMatch(player -> player.getCardsInHand().size()==11));
         assertEquals(97,createdGame.getCardStack().size());
     }
-
-    Response createSaveGameRequest(GameDto requestBody) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        String jsonString = objectMapper.writeValueAsString(requestBody);
-        Request request = new Request.Builder().url(new URL("localhost:8080/api/v1/games"))
-                .post(RequestBody.create(jsonString, JSON)).build();
-        return client.newCall(request).execute();
-    }
-
 
 }
