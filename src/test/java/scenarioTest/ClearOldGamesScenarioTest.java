@@ -51,11 +51,12 @@ public class ClearOldGamesScenarioTest extends ScenarioTest{
 
         reactiveMongoTemplate.save(dbRecord, "games").block();
         var allGames= createGetAllGamesRequest();
+
         assertEquals(2,allGames.size());
 
         gameService.scheduleDeletingOldGames();
-
         allGames = createGetAllGamesRequest();
+
         assertEquals(1,allGames.size());
 
     }

@@ -1,7 +1,10 @@
 package com.eco.ecosystem.services;
 
 import com.eco.ecosystem.dto.GameDto;
-import com.eco.ecosystem.entities.*;
+import com.eco.ecosystem.entities.Game;
+import com.eco.ecosystem.entities.Message;
+import com.eco.ecosystem.entities.Player;
+import com.eco.ecosystem.entities.PlayerCard;
 import com.eco.ecosystem.game.board.Board;
 import com.eco.ecosystem.game.cards.Card;
 import com.eco.ecosystem.game.exceptions.FullPlayerCountException;
