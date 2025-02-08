@@ -1,18 +1,17 @@
 package com.eco.ecosystem.dto;
 
 import com.eco.ecosystem.entities.FinalGeneralCount;
-import com.eco.ecosystem.entities.Game;
 import com.eco.ecosystem.entities.Player;
 import com.eco.ecosystem.entities.PlayerCard;
 import com.eco.ecosystem.game.CardStack;
 import com.eco.ecosystem.game.GameTable;
-import com.eco.ecosystem.game.board.Board;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import utils.Timestamp;
 
 import java.util.List;
 import java.util.Objects;
@@ -36,12 +35,23 @@ public class GameDto{
     List<PlayerCard> cardStack;
     @JsonProperty("turn")
     int turn;
+    @JsonProperty("createdAt")
+    Timestamp createdAt;
 
     public GameDto(GameDto gameDto) {
         this.id = gameDto.getId();
         this.players = gameDto.getPlayers();
         this.cardStack = gameDto.cardStack;
         this.turn = gameDto.turn;
+        this.createdAt = gameDto.getCreatedAt();
+    }
+
+    public GameDto(UUID id, List<Player> players, List<PlayerCard> cardStack, int turn) {
+        this.id = id;
+        this.players = players;
+        this.cardStack = cardStack;
+        this.turn = turn;
+        this.createdAt = Timestamp.now();
     }
 
     public boolean allPlayersAppliedMove(){

@@ -1,14 +1,17 @@
 package com.eco.ecosystem.services;
 
 import com.eco.ecosystem.dto.GameDto;
-import com.eco.ecosystem.entities.*;
+import com.eco.ecosystem.entities.Game;
+import com.eco.ecosystem.entities.Message;
+import com.eco.ecosystem.entities.Player;
+import com.eco.ecosystem.entities.PlayerCard;
 import com.eco.ecosystem.game.board.Board;
 import com.eco.ecosystem.game.cards.Card;
 import com.eco.ecosystem.game.exceptions.FullPlayerCountException;
 import com.eco.ecosystem.game.exceptions.GameNotFoundException;
 import com.eco.ecosystem.game.exceptions.InvalidMoveException;
 import com.eco.ecosystem.repository.GameRepository;
-import com.mongodb.internal.client.model.FindOptions;
+
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +21,15 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import utils.AppUtils;
+import utils.Timestamp;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -58,6 +65,17 @@ public class GameService {
                 .map(AppUtils::gameEntityToDto);
     }
 
+    @Scheduled(fixedRate = 900000)
+    public void scheduleDeletingOldGames(){
+        log.info("Clearing old games...");
+        clearExpiredGames().then(Mono.fromRunnable(()-> log.info("Old games removed"))).subscribe();
+    }
+    public Mono<Void> clearExpiredGames(){
+        Timestamp expirationTime = Timestamp.of(Instant.now().minus(3, ChronoUnit.HOURS));
+        Query query = new Query(Criteria.where(Game.CREATED_AT_FIELD).lt(expirationTime));
+
+        return reactiveMongoTemplate.remove(query, Game.class).then();
+    }
     public Mono<GameDto> updateGame(GameDto gameDto, UUID gameID) {
         Query query = new Query(
                 Criteria.where(Game.ID_FIELD).is(gameID));
@@ -73,7 +91,7 @@ public class GameService {
 
     public Mono<UUID> initGame() {
         var newId = UUID.randomUUID();
-        var newGame = Mono.just(new GameDto(newId, List.of(), List.of(), 0));
+        var newGame = Mono.just(new GameDto(newId, List.of(), List.of(), 0, Timestamp.now()));
         return newGame.map(AppUtils::gameDtoToEntity)
                 .flatMap(gameRepository::insert)
                 .then(Mono.just(newId));
