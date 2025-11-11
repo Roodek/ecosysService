@@ -11,9 +11,13 @@ RUN ls /app -l
 RUN ./gradlew --version
 RUN ./gradlew clean build -x test
 
-FROM gradle:jdk17-corretto-al2023
+FROM amazoncorretto:17-al2023
 WORKDIR /app
 
+RUN yum update -y && \
+    yum install -y ca-certificates && \
+    update-ca-trust force-enable && \
+    yum clean all
 
 # Copy the Spring Boot jar from the build stage
 COPY --from=build /app/build/libs/*.jar app.jar
