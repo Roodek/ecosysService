@@ -270,6 +270,5 @@ public class GameServiceTest extends ServiceTest {
         assertEquals(hand1.get(0),res.getPlayers().get(0).getCardsInHand().get(0));
         assertEquals(hand2.get(0),res.getPlayers().get(1).getCardsInHand().get(0));
         assertEquals(hand3.get(0),res.getPlayers().get(2).getCardsInHand().get(0));
-
     }
 }

@@ -6,6 +6,7 @@ import com.eco.ecosystem.controllers.requestBodies.PutCardRequestBody;
 import com.eco.ecosystem.controllers.requestBodies.PutRabbitCardAndSwapTwoRequestBody;
 import com.eco.ecosystem.controllers.responseObjects.GameResponse;
 import com.eco.ecosystem.dto.GameDto;
+import com.eco.ecosystem.entities.Game;
 import com.eco.ecosystem.entities.Player;
 import com.eco.ecosystem.entities.PlayerCard;
 import com.eco.ecosystem.entities.SelectedMove;
@@ -29,7 +30,7 @@ public class GameScenarioTest extends ScenarioTest {
     @Test
     void contextLoads(){}
     @Test
-    void testGetAllGames() throws IOException {
+    void testGetAllNonStartedGames() throws IOException {
         List<List<PlayerCard>> board = List.of(
                 Arrays.asList(null,null,null),
                 Arrays.asList(null,new PlayerCard("MEADOW"),null),
@@ -45,12 +46,28 @@ public class GameScenarioTest extends ScenarioTest {
                                 board,0
                         )),
                 List.of(new PlayerCard("BEE"), new PlayerCard("ELK")),3);
+        var newGame0turn = new GameDto(
+                UUID.randomUUID(),
+                List.of(
+                        new Player(
+                                UUID.randomUUID(),
+                                "player1",
+                                List.of(new PlayerCard("ELK"), new PlayerCard("RIVER")),null,
+                                board,0
+                        )),
+                List.of(new PlayerCard("BEE"), new PlayerCard("ELK")),0);
         reactiveMongoTemplate.save(AppUtils.gameDtoToEntity(newGame),"games").block();
-        var response = createGetAllGamesRequest();
+        reactiveMongoTemplate.save(AppUtils.gameDtoToEntity(newGame0turn),"games").block();
+
+        assertEquals(2, reactiveMongoTemplate.findAll(Game.class, "games")
+                .collectList()
+                .block().size());
+
+        var response = createGetAllNonStartedGamesRequest();
         ArrayList<GameDto> resBody = new ObjectMapper().readValue(response.body().string(), new TypeReference<List<GameDto>>(){});
         assertEquals(200,response.code());
         assertEquals(1,resBody.size());
-        assertEquals(3,resBody.get(0).getTurn());
+        assertEquals(0,resBody.get(0).getTurn());
 
     }
 
@@ -59,7 +76,7 @@ public class GameScenarioTest extends ScenarioTest {
         var playerNameBody = new PlayerNameBody("player1");
         var response = createInitGameRequest();
         assertEquals(200,response.code());
-        var allGamesResponse = createGetAllGamesRequest();
+        var allGamesResponse = createGetAllNonStartedGamesRequest();
         ArrayList<GameDto> allGames = new ObjectMapper().readValue(allGamesResponse.body().string(), new TypeReference<List<GameDto>>(){});
         var game = allGames.get(0);
         assertEquals(200,allGamesResponse.code());
@@ -73,7 +90,7 @@ public class GameScenarioTest extends ScenarioTest {
         var playerNameBody2 = new PlayerNameBody("player2");
         var createInitGameResponse = createInitGameRequest();
         assertEquals(200,createInitGameResponse.code());
-        var allGamesResponse = createGetAllGamesRequest();
+        var allGamesResponse = createGetAllNonStartedGamesRequest();
         ArrayList<GameDto> allGames = new ObjectMapper().readValue(allGamesResponse.body().string(), new TypeReference<List<GameDto>>(){});
         var game = allGames.get(0);
         assertEquals(200,allGamesResponse.code());
@@ -90,7 +107,7 @@ public class GameScenarioTest extends ScenarioTest {
         assertEquals(200,joinGameResponse2.code());
         assertNotNull(UUID.fromString( new ObjectMapper().readValue(joinGameResponse2.body().string(), String.class)));
 
-        allGamesResponse = createGetAllGamesRequest();
+        allGamesResponse = createGetAllNonStartedGamesRequest();
         allGames = new ObjectMapper().readValue(allGamesResponse.body().string(), new TypeReference<List<GameDto>>(){});
         game = allGames.get(0);
         assertEquals(200,allGamesResponse.code());
@@ -107,7 +124,7 @@ public class GameScenarioTest extends ScenarioTest {
         var playerNameBody3 = new PlayerNameBody("player3");
         var createInitGameResponse = createInitGameRequest();
         assertEquals(200,createInitGameResponse.code());
-        var allGamesResponse = createGetAllGamesRequest();
+        var allGamesResponse = createGetAllNonStartedGamesRequest();
         ArrayList<GameDto> allGames = new ObjectMapper().readValue(allGamesResponse.body().string(), new TypeReference<List<GameDto>>(){});
         var game1 = allGames.get(0);
         assertEquals(200,allGamesResponse.code());
@@ -128,7 +145,7 @@ public class GameScenarioTest extends ScenarioTest {
         assertEquals(200,joinGameResponse3.code());
         assertNotNull(UUID.fromString( new ObjectMapper().readValue(joinGameResponse3.body().string(), String.class)));
 
-        allGamesResponse = createGetAllGamesRequest();
+        allGamesResponse = createGetAllNonStartedGamesRequest();
         allGames = new ObjectMapper().readValue(allGamesResponse.body().string(), new TypeReference<List<GameDto>>(){});
         game1 = allGames.get(0);
         assertEquals(200,allGamesResponse.code());

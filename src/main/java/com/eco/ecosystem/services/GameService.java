@@ -17,11 +17,15 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import utils.AppUtils;
+import utils.Timestamp;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -39,8 +43,10 @@ public class GameService {
     @Autowired
     ReactiveMongoTemplate reactiveMongoTemplate;
 
-    public Flux<GameDto> getAllGames() {
-        return gameRepository.findAll().map(AppUtils::gameEntityToDto);
+    public Flux<GameDto> getAllNonStartedGames() {
+        Query query = new Query(
+                Criteria.where(Game.TURN).is(0));
+        return reactiveMongoTemplate.find(query, Game.class).map(AppUtils::gameEntityToDto);
     }
 
     public Mono<GameDto> getGame(UUID id) {
@@ -55,6 +61,17 @@ public class GameService {
                 .map(AppUtils::gameEntityToDto);
     }
 
+    @Scheduled(fixedRate = 900000)
+    public void scheduleDeletingOldGames(){
+        log.info("Clearing old games...");
+        clearExpiredGames().then(Mono.fromRunnable(()-> log.info("Old games removed"))).subscribe();
+    }
+    public Mono<Void> clearExpiredGames(){
+        Timestamp expirationTime = Timestamp.of(Instant.now().minus(3, ChronoUnit.HOURS));
+        Query query = new Query(Criteria.where(Game.CREATED_AT_FIELD).lt(expirationTime));
+
+        return reactiveMongoTemplate.remove(query, Game.class).then();
+    }
     public Mono<GameDto> updateGame(GameDto gameDto, UUID gameID) {
         Query query = new Query(
                 Criteria.where(Game.ID_FIELD).is(gameID));
@@ -70,7 +87,7 @@ public class GameService {
 
     public Mono<UUID> initGame() {
         var newId = UUID.randomUUID();
-        var newGame = Mono.just(new GameDto(newId, List.of(), List.of(), 0));
+        var newGame = Mono.just(new GameDto(newId, List.of(), List.of(), 0, Timestamp.now()));
         return newGame.map(AppUtils::gameDtoToEntity)
                 .flatMap(gameRepository::insert)
                 .then(Mono.just(newId));
