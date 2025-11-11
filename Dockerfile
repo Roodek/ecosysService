@@ -11,13 +11,14 @@ RUN ls /app -l
 RUN ./gradlew --version
 RUN ./gradlew clean build -x test
 
-FROM amazoncorretto:17-al2023
+FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
 
-RUN yum update -y && \
-    yum install -y ca-certificates && \
-    update-ca-trust force-enable && \
-    yum clean all
+# Update CA certificates
+RUN apt-get update && \
+    apt-get install -y ca-certificates && \
+    update-ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
 
 # Copy the Spring Boot jar from the build stage
 COPY --from=build /app/build/libs/*.jar app.jar
