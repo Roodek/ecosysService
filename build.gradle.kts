@@ -39,6 +39,8 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter:1.20.4")
     testImplementation("org.testcontainers:mongodb:1.20.4")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("org.mongodb:mongodb-driver-sync")
+    implementation(platform("org.mongodb:mongodb-driver-bom:5.6.1"))
 
     implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
     implementation("com.fasterxml.jackson.core:jackson-core:2.15.2")
