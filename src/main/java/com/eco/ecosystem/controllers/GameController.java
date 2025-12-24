@@ -55,7 +55,10 @@ public class GameController {
         simpMessagingTemplate.convertAndSend("/topic/games", new Message("game", "created"));
         return gameService.initGame();
     }
-
+    @PostMapping(path = "/{gameID}/addBot")
+    public Mono<Void> addBotPlayer(@PathVariable UUID gameID){
+        return gameService.addBot(gameID);
+    }
     @PostMapping("/{id}/join")
     public Mono<UUID> joinGame(@PathVariable UUID id,
                                @RequestBody PlayerNameBody playerName) {

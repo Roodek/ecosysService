@@ -22,6 +22,7 @@ public class Player {
     public static final String BOARD_FIELD ="board";
     public static final String SELECTED_MOVE_FIELD ="selectedMove";
     public static final String POINT_COUNT_FIELD ="pointCount";
+    public static final String PLAYER_TYPE_FIELD ="playerType";
     @JsonProperty("_id")
     private UUID id;
     @JsonProperty("name")
@@ -36,6 +37,8 @@ public class Player {
     private int pointCount;
     @JsonProperty("finalGeneralPointCount")
     private FinalGeneralCount finalGeneralPointCount;
+    @JsonProperty
+    private PlayerType playerType = PlayerType.PLAYER;
 
 
     public GamePlayer toGamePlayer(){
@@ -71,5 +74,10 @@ public class Player {
 
     public void printBoard(){
         new Board(board).printBoard();
+    }
+
+    public enum PlayerType {
+        PLAYER,
+        BOT
     }
 }

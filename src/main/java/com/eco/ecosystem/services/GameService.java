@@ -92,6 +92,23 @@ public class GameService {
                 .flatMap(gameRepository::insert)
                 .then(Mono.just(newId));
     }
+    public Mono<Void> addBot(UUID gameID) {
+        Query query = new Query(
+                Criteria.where(Game.ID_FIELD).is(gameID));
+
+        return validateGameExistsAndGet(gameID).flatMap(gameDto -> gameDto.getPlayers().size() < 6 ?
+                reactiveMongoTemplate.updateFirst(query, createBotPlayerUpdate(gameDto.getPlayers().size()), Game.class)
+                        .flatMap(updateResult -> updateResult.getMatchedCount() == 0 ?
+                                Mono.error(new GameNotFoundException()) : Mono.empty()) :
+                Mono.error(new FullPlayerCountException()));
+    }
+    private Update createBotPlayerUpdate(int playerSize){
+        var newPlayeruuid = UUID.randomUUID();
+        var newPlayer = new Player(newPlayeruuid, "bot_"+playerSize, List.of(), null, List.of(List.of()), 0);
+        newPlayer.setPlayerType(Player.PlayerType.BOT);
+        return new Update()
+                .push(Game.PLAYERS_FIELD, newPlayer);
+    }
 
     public Mono<UUID> joinGame(UUID gameID, String playerName) {
         var newPlayeruuid = UUID.randomUUID();
@@ -129,7 +146,7 @@ public class GameService {
     }
 
 
-    private Mono<GameDto> validateGameExistsAndGet(UUID gameID) {
+    public Mono<GameDto> validateGameExistsAndGet(UUID gameID) {
         return reactiveMongoTemplate.findById(gameID, Game.class)
                 .switchIfEmpty(Mono.error(new GameNotFoundException()))
                 .flatMap(game -> Mono.just(AppUtils.gameEntityToDto(game)));

@@ -23,7 +23,10 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import utils.AppUtils;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 @Service
 public class PlayerService {
@@ -43,6 +46,7 @@ public class PlayerService {
 
         return reactiveMongoTemplate.updateFirst(query, update, Game.class);
     }
+
 
     private static Query getPlayerQuery(UUID gameID, UUID playerID) {
         return new Query(
